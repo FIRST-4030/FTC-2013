@@ -12,6 +12,7 @@ Motor Port C        motorC		          NXT Motor             Left side motor
 
 #pragma debuggerWindows("joystickSimple");
 #include "JoystickDriver.c"
+// Test GitAuth
 
 task main()
 {
