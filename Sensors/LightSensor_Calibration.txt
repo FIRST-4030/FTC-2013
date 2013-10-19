@@ -1,0 +1,8 @@
+October 19, 2013
+Darrell Ross and Jack O'Brien 
+Light Sensor Calibration:
+	White Tape - 60 to 70
+	Gray Tiles - 40 to 50
+	Black Wood - 30 to 40
+	Blue Tape - 30 to 40
+	Red Tape - 50 to 62
