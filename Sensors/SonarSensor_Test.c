@@ -29,12 +29,12 @@ task main()
 		// Basic Tank Drive //
 		getJoystickSettings(joystick);
 		if(abs(joystick.joy1_y1) > 10)
-			motor[leftMotor] = -joystick.joy1_y1;
+			motor[leftMotor] = joystick.joy1_y1;
 		else
 			motor[leftMotor] = 0;
 
 		if(abs(joystick.joy1_y2) > 10)
-			motor[rightMotor] = -joystick.joy1_y2;
+			motor[rightMotor] =  joystick.joy1_y2;
 		else
 			motor[rightMotor] = 0;
 	}

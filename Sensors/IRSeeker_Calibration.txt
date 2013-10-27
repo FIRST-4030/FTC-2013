@@ -1,0 +1,14 @@
+October 26, 2013
+Darrell Ross and Ariel Rotter-Aboyoun
+IR Sensor Calibration:
+	IR Beacon Settings at 180:
+		600: 6 o'clock, the emitter closest to the on/off switch and the two emitters clockwise
+		1200: 12 o'clock, the emitter farthest from the on/off switch and the two emitters clockwise
+	IR Beacon Settings at 360:
+		All emitters for 600 and 1200
+	
+	IR Seeker at approximately 20" from the ramp directly center.
+		LL	3
+		L	4
+		R	5
+		RR	6
