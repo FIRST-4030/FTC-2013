@@ -67,7 +67,6 @@ task Drive()
 // This runs first
 task main()
 {
-	waitFor
 	StartTask(Drive);
 
 	//Loop Forever
