@@ -56,56 +56,12 @@ void initializeRobot()
   return;
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//                                         Main Task
-//
-// The following is the main code for the autonomous robot operation. Customize as appropriate for
-// your specific robot.
-//
-// The types of things you might do during the autonomous phase (for the 2008-9 FTC competition)
-// are:
-//
-//   1. Have the robot follow a line on the game field until it reaches one of the puck storage
-//      areas.
-//   2. Load pucks into the robot from the storage bin.
-//   3. Stop the robot and wait for autonomous phase to end.
-//
-// This simple template does nothing except play a periodic tone every few seconds.
-//
-// At the end of the autonomous period, the FMS will autonmatically abort (stop) execution of the program.
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-task main()
+void driveMotors(int powLeft, int powRight, const int nTime)
 {
-  initializeRobot();
-
-  waitForStart(); // Wait for the beginning of autonomous phase.
-
-  	while(SensorValue[sonar] > some value)
-  	{
-			//do some driving
-  		driveMotors(75,75,-1);
-
-  		while(SensorValue[sonar] > some value)
-  		{
-  			//do some more driving
-  			driveMotors(0,75,-1);
-
-  			while(SensorValue[sonar] > some value)
-  			{
-
-
- 				}
- 			}
-  	}
-
-  	//lined up and ready to find IR sensor
-  	IR_out = SensorValue[IRSeeker];
-  	goToBasket(IR_out)
-
+  motor[rightMotor] =  powRight;
+  motor[leftMotor]  =  powLeft;
+  if(nTime >=0)
+  	wait1Msec(nTime);
 }
 
 //basket path
@@ -131,16 +87,88 @@ void goToBasket(int nBasket)
 }
 
 
-//direction functions
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                         Main Task
+//
+// The following is the main code for the autonomous robot operation. Customize as appropriate for
+// your specific robot.
+//
+// The types of things you might do during the autonomous phase (for the 2008-9 FTC competition)
+// are:
+//
+//   1. Have the robot follow a line on the game field until it reaches one of the puck storage
+//      areas.
+//   2. Load pucks into the robot from the storage bin.
+//   3. Stop the robot and wait for autonomous phase to end.
+//
+// This simple template does nothing except play a periodic tone every few seconds.
+//
+// At the end of the autonomous period, the FMS will autonmatically abort (stop) execution of the program.
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void driveMotors(int powLeft, int powRight, const int nTime)
+
+int fullImpulse = 100;
+int halfImpulse = 50;
+int quarterImpulse = 25;
+int eighthImpulse = 12;
+
+task FlagLine()
 {
-  motor[motorRight] =  powRight;
-  motor[motorLeft]  =  powLeft;
-  if(nTime >=0)
-  	wait1Msec(nTime);
+
 }
 
+task OnWallFacingFlag()
+{
+	int firstTurn = 80;
+	int stopLeftTurn = 5;
+  while(SensorValue[sonar] > firstTurn )
+	{
+  	motor[rightMotor] = halfImpulse;
+  	motor[leftMotor] = halfImpulse;
+	}
+
+	int irinit = SensorValue[IRSeeker];
+	while(SensorValue[IRSeeker] != stopLeftTurn && SensorValue[IRSeeker] != 0)
+	{
+		motor[rightMotor] = halfImpulse;
+		motor[leftMotor] = -halfImpulse;
+	}
+	if(SensorValue[IRSeeker] == 0)
+		return;
+
+	while(SensorValue[sonar] > 50)
+	{
+		motor[rightMotor] = quarterImpulse;
+		motor[leftMotor] = quarterImpulse;
+	}
+}
+
+
+
+task main()
+{
+  //initializeRobot();
+  //waitForStart(); // Wait for the beginning of autonomous phase.
+
+	while(true)
+	{
+		getJoystickSettings(joystick);
+
+		//Flag Motor Control
+		if(joy1Btn(1) == 1)
+			StartTask(OnWallFacingFlag);
+
+	}
+
+  //lined up and ready to find IR sensor
+  //	goToBasket(SensorValue[IRSeeker]);
+
+}
+
+
+//direction functions
 
 //not needed?
 void goForward(const int nTime)
