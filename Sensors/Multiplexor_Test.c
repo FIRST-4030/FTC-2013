@@ -3,6 +3,9 @@
 
 /*+++++++++++++++++++++++++++++++++++++++++++++| Notes |++++++++++++++++++++++++++++++++++++++++++++++*/
 #include "../drivers/hitechnic-sensormux.h"
+#include "../drivers/hitechnic-irseeker-v2.h"
+#include "../drivers/lego-touch.h"
+#include "../drivers/lego-light.h"
 
 // Sensor Read Variables //
 int touch1_out = 0;
@@ -16,69 +19,20 @@ const tMUXSensor S_TOUCH2 = msensor_S1_2;
 const tMUXSensor S_TOUCH3 = msensor_S1_3;
 const tMUXSensor S_LIGHT = msensor_S1_4;
 
-void HTSMUXsendCmd(tSensors smux, byte cmd)
-{
- 	ubyte sendMsg[4];
-
- 	sendMsg[0] = 3; // size of I2C message
- 	sendMsg[1] = 0x10; // Address of SMUX
- 	sendMsg[2] = 0x20; // Command register
- 	sendMsg[3] = cmd; // Command to be sent
-
- 	char* sendM = sendMsg;
- 	// Send the command to the SMUX
- 	sendI2CMsg(smux, sendM, 0);
-
- 	// if the HTSMUX_CMD_AUTODETECT command has
- 	// been given, wait 500 ms
- 	if (cmd == HTSMUX_CMD_AUTODETECT)
- 	{
- 		wait1Msec(500);
- 	}
- 	else if (cmd == HTSMUX_CMD_HALT)
- 	{
- 	// Wait 50ms after SMUX is halted
- 		wait1Msec(50);
-	}
-}
-
-int HTSMUXreadAD (tSensors smux, byte chan)
-{
-  ubyte sendMsg[3];
-  ubyte readMsg[2];
-
-  sendMsg[0] = 2; // size of I2C message
-  sendMsg[1] = 0x10; // Address of SMUX
-  // Buffer register
-  sendMsg[2] = 0x36 + (chan * 2);
-
-  char* sendM = sendMsg;
-  char* readM = readMsg;
-
-  // Query the SMUX and read the response
-  sendI2CMsg(smux, sendM, 2);
-  wait1Msec(10);
-  readI2CReply(smux, readM, 2);
-
-  // ensure no weirdness from signed/unsigned
-  // conversions
- 	return (readMsg[0] & 0x00FF) * 4 + (readMsg[1] & 0x00FF);
-}
 
 // Main Task
 // This runs first
 task main()
 {
-	HTSMUXsendCmd(sensor_mux, HTSMUX_CMD_HALT);
-	wait1Msec(200);
-	HTSMUXsendCmd(sensor_mux, HTSMUX_CMD_AUTODETECT);
+	// Turn Light Sensor Light On //
+  LSsetActive(S_LIGHT);
 
-	//Loop Forever
-	while(true)
-	{
-		touch1_out = HTSMUXreadAD(sensor_mux, 1);
-		touch2_out = HTSMUXreadAD(sensor_mux, 2);
-		touch3_out = HTSMUXreadAD(sensor_mux, 3);
-		light_out = HTSMUXreadAD(sensor_mux, 4);
+  while(true)
+  {
+		touch1_out = LSvalNorm(S_TOUCH1);
+		touch2_out = LSvalNorm(S_TOUCH2);
+		touch3_out = LSvalNorm(S_TOUCH3);
+  	light_out = LSvalNorm(S_LIGHT);
 	}
+
 }
