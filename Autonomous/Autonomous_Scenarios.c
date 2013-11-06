@@ -24,6 +24,23 @@
 #pragma debuggerWindows("joystickSimple");
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 
+///// CONSTANTS /////
+
+#define BLIPS_PER_INCH (1440.0 / 12.6)
+#define INCH_PER_BLIPS (12.6 / 1440.0)
+#define InchestoBlips(x) (x * BLIPS_PER_INCH)
+#define BlipstoInches(x) (1/InchestoBlips(x))
+
+#define FULL_IMPULSE (100)
+#define HALF_IMPULSE (50)
+#define QUARTER_IMPULSE (25)
+#define EIGHTH_IMPULSE (12)
+
+int IR_out = 0;
+int Sonar_out = 0;
+int Light_out = 0;
+int motorEncoder_out = 0;
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -40,19 +57,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int IR_out = 0;
-int Sonar_out = 0;
-int Light_out = 0;
-
-//Integer variable that allows you to specify a "deadzone" where values (both positive or negative)
-//less than the threshold will be ignored.
-int threshold = 10;
-
 void initializeRobot()
 {
-  // Place code here to sinitialize servos to starting positions.
+  // Place code here to initialize servos to starting positions.
   // Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
-
+	wait1Msec(1000);
   return;
 }
 
@@ -63,6 +72,7 @@ void driveMotors(int powLeft, int powRight, const int nTime)
   if(nTime >=0)
   	wait1Msec(nTime);
 }
+
 
 //basket path
 void goToBasket(int nBasket)
@@ -84,6 +94,69 @@ void goToBasket(int nBasket)
 			driveMotors(75,0,1500);
 		}
 
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                         AUTONOMOUS SCENARIOS
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Start the robot with the right side flush with the wall.
+// Face the robot towards the flag.
+void OnWallFacingFlag()
+{
+	int firstTurn = 80; // distance to wall of ~32"
+	while(SensorValue[sonar] > firstTurn )
+		driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
+
+	// Left Turn //
+	int stopLeftTurn = 5;
+	while(SensorValue[IRSeeker] != stopLeftTurn)
+		driveMotors(-HALF_IMPULSE, HALF_IMPULSE, -1);
+
+	// Approach Basket //
+	while(SensorValue[sonar] > 50 && SensorValue[light] > 40)
+		driveMotors(QUARTER_IMPULSE, QUARTER_IMPULSE, -1);
+
+	driveMotors(0,0,-1);
+}
+
+// Start the robot with the back right wheel touching the wall and the right wheels lined up with the flag line.
+// Face the robot along the flag line.
+void OnFlagLineRightCorner()
+{
+	nMotorEncoder[leftMotor] = 0;
+	int firstTurn = 2; // IRSeeker indicates far left
+	while(SensorValue[IRSeeker] > firstTurn )
+		driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
+
+	motorEncoder_out = nMotorEncoder[leftMotor];
+
+	if(motorEncoder_out < InchestoBlips(30))
+	{
+		//Take inside turn
+	  motor[spinnerMotor] = 100;
+  }
+	else
+	{
+		//Take outside turn
+	  motor[spinnerMotor] = 100;
+	}
+
+
+	// Left Turn //
+	int stopLeftTurn = 5;
+	while(SensorValue[IRSeeker] != stopLeftTurn)
+		driveMotors(-HALF_IMPULSE, HALF_IMPULSE, -1);
+
+	// Approach Basket //
+	while(SensorValue[sonar] > 50 && SensorValue[light] > 40)
+		driveMotors(EIGHTH_IMPULSE, EIGHTH_IMPULSE, -1);
+
+	driveMotors(0,0,-1);
 }
 
 
@@ -109,47 +182,27 @@ void goToBasket(int nBasket)
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-int fullImpulse = 100;
-int halfImpulse = 50;
-int quarterImpulse = 25;
-int eighthImpulse = 12;
 
 task main()
 {
   initializeRobot();
   //waitForStart(); // Wait for the beginning of autonomous phase.
 
+  while(true)
+	{
 		IR_out = SensorValue[IRSeeker];
 		Sonar_out = SensorValue[sonar];
 		Light_out = SensorValue[light];
-
-	//while(true)
-	//{
-		//getJoystickSettings(joystick);
+		getJoystickSettings(joystick);
 
 		// Start: Right side on wall with front of robot facing flag.
-		//if(joy1Btn(1) == 1)
-		//{
-			int firstTurn = 80; // distance to wall of ~32"
-			while(SensorValue[sonar] > firstTurn )
-				driveMotors(halfImpulse, halfImpulse, -1);
-
-			// Left Turn //
-			int stopLeftTurn = 5;
-			while(SensorValue[IRSeeker] != stopLeftTurn && SensorValue[IRSeeker] != 0)
-				driveMotors(-halfImpulse, halfImpulse, -1);
-
-			// Approach Basket //
-			while(SensorValue[sonar] > 50)
-				driveMotors(quarterImpulse, quarterImpulse, -1);
-		//}
+		if(joy1Btn(1) == 1) // X //
+			OnWallFacingFlag();
 
 		// Start: right wheels aligned with flag line. Back right wheel touching wall.
-		if(joy1Btn(2) == 1)
-		{
-		}
-
-	//}
+		if(joy1Btn(2) == 1) // A //
+			OnFlagLineRightCorner();
+	}
 
   //lined up and ready to find IR sensor
   //	goToBasket(SensorValue[IRSeeker]);
