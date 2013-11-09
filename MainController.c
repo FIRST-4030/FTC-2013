@@ -1,8 +1,5 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  none)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S2,     IRSeeker,       sensorHiTechnicIRSeeker1200)
-#pragma config(Sensor, S3,     light,          sensorLightActive)
-#pragma config(Sensor, S4,     sonar,          sensorSONAR)
+#pragma config(Sensor, S2,     SMUX,           sensorI2CCustom9V)
 #pragma config(Motor,  motorA,          gripperMotor,  tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C1_1,     rightMotor,    tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     leftMotor,     tmotorTetrix, openLoop, reversed, encoder)
@@ -18,7 +15,18 @@ FTC Team #7462
 Main Robot Code
 /*///////////////////////////////
 #pragma debuggerWindows("joystickSimple");
+#include "drivers/hitechnic-sensormux.h"
+#include "drivers/hitechnic-irseeker-v2.h"
+#include "drivers/lego-ultrasound.h"
+#include "drivers/lego-touch.h"
+#include "drivers/lego-light.h"
 #include "JoystickDriver.c"
+
+///// Sensor Multiplexer Interface /////
+const tMUXSensor sonar = msensor_S2_1;
+const tMUXSensor IRSeeker = msensor_S2_2;
+const tMUXSensor lightRight = msensor_S2_3;
+const tMUXSensor lightLeft = msensor_S2_4;
 
 /////////////////////
 ///// CONSTANTS /////
@@ -28,12 +36,23 @@ const int quarterImpulse = 25;
 const int eighthImpulse = 12;
 int IR_out = 0;
 int Sonar_out = 0;
-int Light_out = 0;
+int LightRight_out = 0;
+int LightLeft_out = 0;
 int motorEncoder_out = 0;
+int motorEncoder_inches = 0;
 
-//Integer variable that allows you to specify a "deadzone" where values (both positive or negative)
-//less than the threshold will be ignored.
-int threshold = 10;
+#define BLIPS_PER_INCH (1440.0 / 12.6)
+#define INCH_PER_BLIPS (12.6 / 1440.0)
+
+int B2I(int x)
+{
+	return x / BLIPS_PER_INCH;
+}
+
+int I2B(int x)
+{
+	return x * INCH_PER_BLIPS;
+}
 
 ////////////////////////////////
 ///// ROBOT INITIALIZATION /////
@@ -41,6 +60,33 @@ void initializeRobot()
 {
   // Place code here to initialize servos to starting positions.
   // Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
+
+	// Turn Light Sensor Light On //
+  LSsetActive(lightRight);
+  LSsetActive(lightLeft);
+
+	// Initialize Sensors //
+	//SensorValue[IRSeeker] = 0;
+	//SensorValue[light] = 0;
+	//SensorValue[sonar] = 0;
+
+  // Reinitialize Constants //
+	int IR_out = 0;
+	int Sonar_out = 0;
+	int LightRight_out = 0;
+	int LightLeft_out = 0;
+	int motorEncoder_out = 0;
+	int motorEncoder_inches = 0;
+
+
+	// Initialize Motor Encoders //
+	nMotorEncoder[leftMotor] = 0;
+
+	// Stop All Motors //
+	motor[leftMotor] = 0;
+	motor[rightMotor] = 0;
+	motor[spinnerMotor] = 0;
+
 	wait1Msec(1000);
   return;
 }
@@ -49,6 +95,9 @@ void initializeRobot()
 ///// DRIVE TASK /////
 task Drive()
 {
+	//Integer variable that allows you to specify a "deadzone" where values (both positive or negative)
+	//less than the threshold will be ignored.
+	int threshold = 10;
 	while(true)
 	{
 		//Get the Latest joystick values
@@ -93,10 +142,12 @@ task main()
 	while(true)
 	{
 		// Sensor Calibration //
-		IR_out = SensorValue[IRSeeker];
-		Sonar_out = SensorValue[sonar];
-		Light_out = SensorValue[light];
+		IR_out = HTIRS2readACDir(IRSeeker);
+		Sonar_out = USreadDist(sonar);
+		LightRight_out = LSvalRaw(lightRight);
+		LightLeft_out = LSvalRaw(lightLeft);
 		motorEncoder_out = nMotorEncoder[leftMotor];
+		motorEncoder_inches = B2I(motorEncoder_out);
 
 		//Get the Latest joystick values
 		getJoystickSettings(joystick);
@@ -127,6 +178,11 @@ task main()
 		else
 		{
 			MoveLiftMotor(0,-1);
+		}
+
+		if(joy1Btn(9) == 1)
+		{
+			nMotorEncoder[leftMotor] = 0;
 		}
 	}
 }

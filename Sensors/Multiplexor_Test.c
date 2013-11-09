@@ -3,6 +3,7 @@
 
 /*+++++++++++++++++++++++++++++++++++++++++++++| Notes |++++++++++++++++++++++++++++++++++++++++++++++*/
 #include "../drivers/hitechnic-sensormux.h"
+#include "../drivers/lego-ultrasound.h"
 #include "../drivers/hitechnic-irseeker-v2.h"
 #include "../drivers/lego-touch.h"
 #include "../drivers/lego-light.h"
