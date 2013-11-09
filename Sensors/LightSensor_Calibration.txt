@@ -6,3 +6,19 @@ Light Sensor Calibration:
 	Black Wood - 30 to 40
 	Blue Tape - 30 to 40
 	Red Tape - 50 to 62
+	
+	
+	
+November 19, 2013
+Darrell Ross
+Light Sensor Calibration needs redone because they are now running through the SMUX
+	Minimum		:	250 on Black Wood
+	Maximum		:	480 on White Tape
+	
+Sorted by Number:
+	250 to 300	:	Black Wood
+	290 to 320  :	Blue Tape
+	340 to 365  :   Gray Tiles
+	380 to 420  :	Red Tape
+	430 to 480  :	White Tape
+	

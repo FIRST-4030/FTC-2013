@@ -44,29 +44,25 @@ int I2B(int x)
 	return x * INCH_PER_BLIPS;
 }
 
+void FlashLights(int times, int delay)
+{
+	for(int i=0; i<times; i++)
+	{
+		LSsetInactive(lightRight);
+  	LSsetInactive(lightLeft);
+		wait1Msec(delay);
+	  LSsetActive(lightRight);
+  	LSsetActive(lightLeft);
+		wait1Msec(delay);
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-//
 //                                    initializeRobot
-//
 // Prior to the start of autonomous mode, you may want to perform some initialization on your robot.
-// Things that might be performed during initialization include:
-//   1. Move motors and servos to a preset position.
-//   2. Some sensor types take a short while to reach stable values during which time it is best that
-//      robot is not moving. For example, gyro sensor needs a few seconds to obtain the background
-//      "bias" value.
-//
-// In many cases, you may not have to add any code to this function and it will remain "empty".
-//
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 void initializeRobot()
 {
-  // Place code here to initialize servos to starting positions.
-  // Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
-
-	// Turn Light Sensor Light On //
-  LSsetActive(lightRight);
-  LSsetActive(lightLeft);
-
 	// Initialize Motor Encoders //
 	nMotorEncoder[leftMotor] = 0;
 
@@ -75,8 +71,10 @@ void initializeRobot()
 	motor[rightMotor] = 0;
 	motor[spinnerMotor] = 0;
 
-	wait1Msec(1000);
-  return;
+	// Cycle Light Sensor Lights //
+	// Indicates Initialization Complete //
+	FlashLights(5,50);
+	return;
 }
 
 void driveMotors(int powLeft, int powRight, const int nTime)
@@ -87,26 +85,48 @@ void driveMotors(int powLeft, int powRight, const int nTime)
   	wait1Msec(nTime);
 }
 
-//basket path
-void goToBasket(int nBasket)
+void InsideLeftTurn(bool reverse)
 {
-	if(nBasket == 3)          // LL
-		{
-			driveMotors(0,75,1500);
-		}
-		else if(nBasket == 4)     // Left
-		{
-			driveMotors(50,75,1000);
-		}
-		else if(nBasket == 5)     // Right
-		{
-			driveMotors(75,50,1000);
-		}
-		else if (nBasket == 6)		// RR
-		{
-			driveMotors(75,0,1500);
-		}
+	if(reverse == false)
+		driveMotors(-HALF_IMPULSE,0,-1);
+	else
+		driveMotors(HALF_IMPULSE,0,-1);
+}
+void OutsideLeftTurn(bool reverse)
+{
+	if(reverse == false)
+		driveMotors(-QUARTER_IMPULSE,HALF_IMPULSE,-1);
+	else
+		driveMotors(HALF_IMPULSE,-HALF_IMPULSE,-1);
+}
 
+void FollowLine(int lightTargetOff, int lightTargetOn, int distance)
+{
+	nMotorEncoder[leftMotor] = 0;
+	while(nMotorEncoder[leftMotor] < distance)
+	{
+
+	}
+}
+
+//////////////////////////////
+//				DRIVE TASK			  //
+//////////////////////////////
+task Drive()
+{
+	int threshold = 10;
+	while(true)
+	{
+		getJoystickSettings(joystick);
+		if(abs(joystick.joy1_y1) > threshold)
+			motor[leftMotor] = joystick.joy1_y1;
+		else
+			motor[leftMotor] = 0;
+		if(abs(joystick.joy1_y2) > threshold)
+			motor[rightMotor] = joystick.joy1_y2;
+		else
+			motor[rightMotor] = 0;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,41 +156,74 @@ void OnWallFacingFlag()
 
 // Start the robot with the back right wheel touching the wall and the right wheels lined up with the flag line.
 // Face the robot along the flag line.
-void OnFlagLineRightCorner()
+void OnFlagLineRightCorner_Basket()
 {
 	nMotorEncoder[leftMotor] = 0;
-	int firstTurn = 8; // IRSeeker indicates far left
-	while(HTIRS2readACDir(IRSeeker) < firstTurn )
+	int startTurn = 8; // IRSeeker indicates far left
+	while(HTIRS2readACDir(IRSeeker) < startTurn )
 		driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
 
+	int encoderAtTurn = nMotorEncoder[leftMotor];
 	motorEncoder_out = nMotorEncoder[leftMotor];
-	motorEncoder_inches = B2I(motorEncoder_out);
-
+	int stopTurn = 5;
 	if(nMotorEncoder[leftMotor] < 3000)
 	{
 		//Take Inside Left Turn //
-		int stopLeftTurn = 5;
-		while(HTIRS2readACDir(IRSeeker) != stopLeftTurn)
-			driveMotors(-HALF_IMPULSE, 0, -1);
+		while(HTIRS2readACDir(IRSeeker) != stopTurn)
+			InsideLeftTurn(false);
   }
 	else
 	{
 		//Take Outside Left Turn //
-		int stopLeftTurn = 5;
-		while(HTIRS2readACDir(IRSeeker) != stopLeftTurn)
-			driveMotors(-QUARTER_IMPULSE, HALF_IMPULSE, -1);
+		while(HTIRS2readACDir(IRSeeker) != stopTurn)
+			OutsideLeftTurn(false);
 	}
 
-	// Stop Motors //
+	///// PLACEHOLDER FOR DUMPING ROUTINE /////
+	driveMotors(0,0,-1);
+	FlashLights(5,50);
+	///////////////////////////////////////////
+
+	// Return to Starting Point //
+	while(HTIRS2readACDir(IRSeeker) != startTurn)
+	{
+		if(encoderAtTurn < 3000)
+			InsideLeftTurn(true);
+		else
+			OutsideLeftTurn(true);
+	}
+	while(nMotorEncoder[leftMotor] > 0)
+		driveMotors(-HALF_IMPULSE,-HALF_IMPULSE,-1);
+
 	driveMotors(0,0,-1);
 }
-
-void CeaseAndDesist()
+void OnFlagLineRightCorner_Ramp()
 {
-	StopAllTasks();
-	initializeRobot();
-}
+	// Turn Left Dead Reckoning //
+	driveMotors(-HALF_IMPULSE,HALF_IMPULSE,850);
 
+	while(LSvalRaw(lightLeft) < 370)
+		driveMotors(HALF_IMPULSE,HALF_IMPULSE,-1);
+	wait1Msec(200);
+
+	////////////////////// NEEDS TESTING BEYOND HERE ///////////////////
+	while(LSvalRaw(lightLeft) < 430)
+		driveMotors(QUARTER_IMPULSE,-QUARTER_IMPULSE,-1);
+
+	// Follow Line To Ramp //
+	while(LSvalRaw(lightLeft) > 300)
+	{
+		if(LSvalRaw(lightLeft) > 370)
+			motor[leftMotor] = motor[leftMotor] - 10;
+		else if(LSvalRaw(lightRight) > 370)
+			motor[rightMotor] = motor[rightMotor] -10;
+		else
+			driveMotors(QUARTER_IMPULSE,QUARTER_IMPULSE,-1);
+	}
+	FollowLine(300,430,3000);
+
+	driveMotors(0,0,-1);
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                         Main Task
@@ -196,6 +249,8 @@ task main()
   initializeRobot();
   //waitForStart(); // Wait for the beginning of autonomous phase.
 
+  StartTask(Drive); // Allows control of robot between scenarios //
+
   while(true)
 	{
 		getJoystickSettings(joystick);
@@ -208,51 +263,31 @@ task main()
 
 		// Start: Right side on wall with front of robot facing flag.
 		if(joy1Btn(1) == 1) // X //
+		{
+			StopTask(Drive);
 			OnWallFacingFlag();
+			StartTask(Drive);
+		}
 
 		// Start: right wheels aligned with flag line. Back right wheel touching wall.
 		if(joy1Btn(2) == 1) // A //
-			OnFlagLineRightCorner();
+		{
+			StopTask(Drive);
+			OnFlagLineRightCorner_Basket();
+			StartTask(Drive);
+		}
+		if(joy1Btn(3) == 1) // B //
+		{
+			StopTask(Drive);
+			OnFlagLineRightCorner_Ramp();
+			StartTask(Drive);
+		}
+		if(joy1Btn(9) == 1)
+			nMotorEncoder[leftMotor] = 0;
 
-		if(joy1Btn(10) == 1) // start button //
-			CeaseAndDesist();
+		if(joy1Btn(10) == 1) // Start Button // Reinitialize Robot //
+			initializeRobot();
 	}
   //lined up and ready to find IR sensor
   //	goToBasket(SensorValue[IRSeeker]);
-}
-
-
-//direction functions
-
-//not needed?
-void goForward(const int nTime)
-{
-  motor[leftMotor]  = 75;
-  motor[rightMotor] = 75;
-  if(nTime >=0)
-  	wait1Msec(nTime);
-}
-
-void turnRight(const int nTime)
-{
-  motor[leftMotor]  = 75;
-  motor[rightMotor] =  0;
-  if(nTime >=0)
-  	wait1Msec(nTime);
-}
-
-void turnLeft(const int nTime)
-{
-  motor[leftMotor]  =  0;
-  motor[rightMotor] = 75;
-  if(nTime >=0)
-  	wait1Msec(nTime);
-}
-
-void goBackwards(const int nTime)
-{
-  motor[leftMotor]  = -75;
-  motor[rightMotor] = -75;
-  if(nTime >=0)
-  	wait1Msec(nTime);
 }

@@ -1,4 +1,5 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  none)
+#pragma config(Sensor, S1,     motors,         sensorNone)
 #pragma config(Sensor, S2,     SMUX,           sensorI2CCustom9V)
 #pragma config(Motor,  motorA,          gripperMotor,  tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C1_1,     rightMotor,    tmotorTetrix, openLoop)
@@ -58,18 +59,6 @@ int I2B(int x)
 ///// ROBOT INITIALIZATION /////
 void initializeRobot()
 {
-  // Place code here to initialize servos to starting positions.
-  // Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
-
-	// Turn Light Sensor Light On //
-  LSsetActive(lightRight);
-  LSsetActive(lightLeft);
-
-	// Initialize Sensors //
-	//SensorValue[IRSeeker] = 0;
-	//SensorValue[light] = 0;
-	//SensorValue[sonar] = 0;
-
   // Reinitialize Constants //
 	int IR_out = 0;
 	int Sonar_out = 0;
@@ -77,7 +66,6 @@ void initializeRobot()
 	int LightLeft_out = 0;
 	int motorEncoder_out = 0;
 	int motorEncoder_inches = 0;
-
 
 	// Initialize Motor Encoders //
 	nMotorEncoder[leftMotor] = 0;
@@ -87,8 +75,20 @@ void initializeRobot()
 	motor[rightMotor] = 0;
 	motor[spinnerMotor] = 0;
 
-	wait1Msec(1000);
-  return;
+	// Cycle Light Sensor Lights //
+	// Indicates Initialization Complete //
+	int delay = 50;
+	for(int i=0; i<10; i++)
+	{
+		LSsetInactive(lightRight);
+  	LSsetInactive(lightLeft);
+		wait1Msec(delay);
+	  LSsetActive(lightRight);
+  	LSsetActive(lightLeft);
+		wait1Msec(delay);
+	}
+
+	return;
 }
 
 //////////////////////
@@ -184,5 +184,7 @@ task main()
 		{
 			nMotorEncoder[leftMotor] = 0;
 		}
+		if(joy1Btn(10) == 1)
+			initializeRobot();
 	}
 }
