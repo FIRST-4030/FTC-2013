@@ -49,7 +49,7 @@ void FlashLights(int times, int delay)
 	for(int i=0; i<times; i++)
 	{
 		LSsetInactive(lightRight);
-  	LSsetInactive(lightLeft);
+	  LSsetInactive(lightLeft);
 		wait1Msec(delay);
 	  LSsetActive(lightRight);
   	LSsetActive(lightLeft);
@@ -88,9 +88,9 @@ void driveMotors(int powLeft, int powRight, const int nTime)
 void InsideLeftTurn(bool reverse)
 {
 	if(reverse == false)
-		driveMotors(-HALF_IMPULSE,0,-1);
+		driveMotors(-FULL_IMPULSE,0.35*FULL_IMPULSE,-1);
 	else
-		driveMotors(HALF_IMPULSE,0,-1);
+		driveMotors(FULL_IMPULSE,0,-1);
 }
 void OutsideLeftTurn(bool reverse)
 {
@@ -100,13 +100,14 @@ void OutsideLeftTurn(bool reverse)
 		driveMotors(HALF_IMPULSE,-HALF_IMPULSE,-1);
 }
 
-void FollowLine(int lightTargetOff, int lightTargetOn, int distance)
+void FollowLine(int lineColor)
 {
-	nMotorEncoder[leftMotor] = 0;
-	while(nMotorEncoder[leftMotor] < distance)
-	{
-
-	}
+	if(LSvalRaw(lightLeft) > lineColor)
+		driveMotors(0,QUARTER_IMPULSE,-1);
+	else if(LSvalRaw(lightRight) > lineColor)
+		driveMotors(QUARTER_IMPULSE,0,-1);
+	else
+		driveMotors(QUARTER_IMPULSE,QUARTER_IMPULSE,-1);
 }
 
 //////////////////////////////
@@ -170,13 +171,13 @@ void OnFlagLineRightCorner_Basket()
 	{
 		//Take Inside Left Turn //
 		while(HTIRS2readACDir(IRSeeker) != stopTurn)
-			InsideLeftTurn(false);
+			OutsideLeftTurn(false);
   }
 	else
 	{
 		//Take Outside Left Turn //
 		while(HTIRS2readACDir(IRSeeker) != stopTurn)
-			OutsideLeftTurn(false);
+			InsideLeftTurn(false);
 	}
 
 	///// PLACEHOLDER FOR DUMPING ROUTINE /////
@@ -188,9 +189,9 @@ void OnFlagLineRightCorner_Basket()
 	while(HTIRS2readACDir(IRSeeker) != startTurn)
 	{
 		if(encoderAtTurn < 3000)
-			InsideLeftTurn(true);
-		else
 			OutsideLeftTurn(true);
+		else
+			InsideLeftTurn(true);
 	}
 	while(nMotorEncoder[leftMotor] > 0)
 		driveMotors(-HALF_IMPULSE,-HALF_IMPULSE,-1);
@@ -202,25 +203,33 @@ void OnFlagLineRightCorner_Ramp()
 	// Turn Left Dead Reckoning //
 	driveMotors(-HALF_IMPULSE,HALF_IMPULSE,850);
 
-	while(LSvalRaw(lightLeft) < 370)
+	// Forward until we reach White Tape //
+	while(LSvalRaw(lightLeft) < 475)
 		driveMotors(HALF_IMPULSE,HALF_IMPULSE,-1);
-	wait1Msec(200);
+	driveMotors(0,0,200);
 
-	////////////////////// NEEDS TESTING BEYOND HERE ///////////////////
-	while(LSvalRaw(lightLeft) < 430)
+	// Turn to Follow Line //
+	while(LSvalRaw(lightLeft) < 475)
 		driveMotors(QUARTER_IMPULSE,-QUARTER_IMPULSE,-1);
+	driveMotors(0,0,200);
+
+	while(LSvalRaw(lightRight) < 475)
+	{
+		if(LSvalRaw(lightRight) < 320)
+			break;
+		while(LSvalRaw(lightLeft) > 475)
+			driveMotors(QUARTER_IMPULSE,QUARTER_IMPULSE,-1);
+		driveMotors(0,0,200);
+
+		while(LSvalRaw(lightRight) < 475 && LSvalRaw(lightLeft) < 475)
+			driveMotors(QUARTER_IMPULSE,0,-1);
+		driveMotors(0,0,200);
+	}
+	nMotorEncoder[leftMotor] = 0;
 
 	// Follow Line To Ramp //
-	while(LSvalRaw(lightLeft) > 300)
-	{
-		if(LSvalRaw(lightLeft) > 370)
-			motor[leftMotor] = motor[leftMotor] - 10;
-		else if(LSvalRaw(lightRight) > 370)
-			motor[rightMotor] = motor[rightMotor] -10;
-		else
-			driveMotors(QUARTER_IMPULSE,QUARTER_IMPULSE,-1);
-	}
-	FollowLine(300,430,3000);
+	while(nMotorEncoder[leftMotor] < 3000)
+		FollowLine(475);
 
 	driveMotors(0,0,-1);
 }

@@ -9,16 +9,42 @@ Light Sensor Calibration:
 	
 	
 	
-November 19, 2013
+November 9, 2013
 Darrell Ross
-Light Sensor Calibration needs redone because they are now running through the SMUX
+Light Sensor Calibration
+Wheels: 4"
+Distance Between Sensors: 1"
+Distance to Floor: 1.5"
 	Minimum		:	250 on Black Wood
 	Maximum		:	480 on White Tape
-	
-Sorted by Number:
 	250 to 300	:	Black Wood
 	290 to 320  :	Blue Tape
 	340 to 365  :   Gray Tiles
 	380 to 420  :	Red Tape
 	430 to 480  :	White Tape
+	
+	
+November 12, 2013
+Darrell Ross
+Light Sensor Calibration
+Wheels: 3"
+Distance Between Sensors: 1"
+Distance to Floor: 0.5"
+	Minimum		:	320 on Black Wood
+	Maximum		:	570 on White Tape
+	320 to 335	:	Black Wood
+	340 to 365  :	Blue Tape
+	410 to 435  :   Gray Tiles
+	505 to 520  :	Red Tape
+	550 to 585  :	White Tape
+
+Distance to Floor: 1.0"
+	Minimum		:	270 on Black Wood
+	Maximum		:	570 on White Tape
+	270 to 320	:	Black Wood
+	322 to 350  :	Blue Tape
+	360 to 395  :   Gray Tiles
+	420 to 465  :	Red Tape
+	475 to 515  :	White Tape
+
 	
