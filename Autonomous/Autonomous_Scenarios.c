@@ -66,12 +66,11 @@ void FlashLights(int times, int delay)
 //                                    initializeRobot
 // Prior to the start of autonomous mode, you may want to perform some initialization on your robot.
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-void initializeRobot()
-{
+void initializeRobot() {
 	// Initialize the sensor and motor configuration
 	setLightSensorHeight(1.5);
 	setDriveMotors(leftMotor, rightMotor);
-	setLineSensors((tSensors)lightLeft, (tSensors)lightRight);
+	setLineSensors(lightLeft, lightRight);
 
 	// Initialize Motor Encoders //
 	resetDriveEncoder();
@@ -118,8 +117,7 @@ void Wait() {
 //////////////////////////////
 //				DRIVE TASK			  //
 //////////////////////////////
-task Drive()
-{
+task Drive() {
 	int threshold = 10;
 	while(true)
 	{
@@ -194,41 +192,21 @@ void OnFlagLineRightCorner_Basket()  //Add a bool variable that can be passed an
 }
 // Start Same as OnFlagLineRightCorner_Basket //
 // Turns, finds line, follows line up on ramp and stops //
-void OnFlagLineRightCorner_Ramp()
-{
+void OnFlagLineRightCorner_Ramp() {
 	// Turn Left Dead Reckoning //
-	driveMotors(-HALF_IMPULSE,HALF_IMPULSE,850);
+	driveMotors(-1 * HALF_IMPULSE, HALF_IMPULSE, 850);
 
-	// Forward until we reach White Tape //
-	while(LSvalRaw(lightLeft) < 475)
-		driveMotors(HALF_IMPULSE,HALF_IMPULSE,-1);
-	driveMotors(0,0,200);
+	// Forward to white line
+	driveToColor(WHITE, HALF_IMPULSE);
 
-	// Turn to Follow Line //
-	while(LSvalRaw(lightLeft) < 475)
-		driveMotors(QUARTER_IMPULSE,-QUARTER_IMPULSE,-1);
-	driveMotors(0,0,200);
+	// Align with white line
+	alignLine(WHITE, QUARTER_IMPULSE);
 
-	// Line Up With Line //
-	while(LSvalRaw(lightRight) < 475)
-	{
-		if(LSvalRaw(lightRight) < 320)
-			break;
-		while(LSvalRaw(lightLeft) > 475)
-			driveMotors(QUARTER_IMPULSE,QUARTER_IMPULSE,-1);
-		driveMotors(0,0,200);
+	// Follow line to ramp
+	followLineToColor(WHITE, HALF_IMPULSE, BLACK);
 
-		while(LSvalRaw(lightRight) < 475 && LSvalRaw(lightLeft) < 475)
-			driveMotors(QUARTER_IMPULSE,0,-1);
-		driveMotors(0,0,200);
-	}
-	nMotorEncoder[leftMotor] = 0;
-
-	// Follow Line To Ramp //
-	while(nMotorEncoder[leftMotor] < 3500)
-		FollowLine(475);
-
-	driveMotors(0,0,-1);
+	// Drive up ramp
+	followLineToDistance(WHITE, HALF_IMPULSE, 3500);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
