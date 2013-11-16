@@ -13,6 +13,10 @@
 #include "../drivers/lego-ultrasound.h"
 #include "../drivers/lego-touch.h"
 #include "../drivers/lego-light.h"
+#include "../sensors/colors.c"
+#include "../Motors/motors.c"
+#include "../Drive/lines.c"
+#include "../Drive/drive.c"
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 
 ///// Sensor Multiplexer Interface /////
@@ -28,6 +32,7 @@ const tMUXSensor lightLeft = msensor_S2_4;
 #define HALF_IMPULSE (50)
 #define QUARTER_IMPULSE (25)
 #define EIGHTH_IMPULSE (12)
+#define WALL_TO_MID (3000)
 
 int IR_out = 0;
 int Sonar_out = 0;
@@ -63,26 +68,22 @@ void FlashLights(int times, int delay)
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 void initializeRobot()
 {
+	// Initialize the sensor and motor configuration
+	setLightSensorHeight(1.5);
+	setDriveMotors(leftMotor, rightMotor);
+	setLineSensors((tSensors)lightLeft, (tSensors)lightRight);
+
 	// Initialize Motor Encoders //
-	nMotorEncoder[leftMotor] = 0;
+	resetDriveEncoder();
 
 	// Stop All Motors //
-	motor[leftMotor] = 0;
-	motor[rightMotor] = 0;
+	stopDriveMotors();
 	motor[spinnerMotor] = 0;
 
 	// Cycle Light Sensor Lights //
 	// Indicates Initialization Complete //
 	FlashLights(5,50);
 	return;
-}
-
-void driveMotors(int powLeft, int powRight, const int nTime)
-{
-  motor[rightMotor] =  powRight;
-  motor[leftMotor]  =  powLeft;
-  if(nTime >=0)
-  	wait1Msec(nTime);
 }
 
 void InsideLeftTurn(bool reverse)
@@ -110,6 +111,10 @@ void FollowLine(int lineColor)
 		driveMotors(QUARTER_IMPULSE,QUARTER_IMPULSE,-1);
 }
 
+void Wait() {
+	wait1Msec(10000);
+}
+
 //////////////////////////////
 //				DRIVE TASK			  //
 //////////////////////////////
@@ -132,72 +137,63 @@ task Drive()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                         AUTONOMOUS SCENARIOS
+//                                         AUTONOMOUS
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-// Start the robot with the right side flush with the wall.
-// Face the robot towards the flag.
-void OnWallFacingFlag()
-{
-	int firstTurn = 80; // distance to wall of ~32"
-	while(USreadDist(sonar) > firstTurn )
-		driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
-
-	// Left Turn //
-	int stopLeftTurn = 5;
-	while(HTIRS2readACDir(IRSeeker) != stopLeftTurn)
-		driveMotors(-HALF_IMPULSE, HALF_IMPULSE, -1);
-
-	// Approach Basket //
-	while(USreadDist(sonar) > 50) // && LSvalRaw(lightLeft) > 40) Light sensors need recalibrated with SMUX
-		driveMotors(QUARTER_IMPULSE, QUARTER_IMPULSE, -1);
-
-	driveMotors(0,0,-1);
-}
-
 // Start the robot with the back right wheel touching the wall and the right wheels lined up with the flag line.
 // Face the robot along the flag line.
-void OnFlagLineRightCorner_Basket()
+void OnFlagLineRightCorner_Basket()  //Add a bool variable that can be passed and call Wait?
 {
-	nMotorEncoder[leftMotor] = 0;
-	int startTurn = 8; // IRSeeker indicates far left
-	while(HTIRS2readACDir(IRSeeker) < startTurn )
-		driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
-
-	int encoderAtTurn = nMotorEncoder[leftMotor];
-	motorEncoder_out = nMotorEncoder[leftMotor];
-	int stopTurn = 5;
-	if(nMotorEncoder[leftMotor] < 3000)
+	//Would initiate Wait, could set whether or not to wait at beginning
+	/*
+	if(bool wait = true)
 	{
-		//Take Inside Left Turn //
-		while(HTIRS2readACDir(IRSeeker) != stopTurn)
-			OutsideLeftTurn(false);
-  }
-	else
+		Wait();
+	}*/
+	if(HTIRS2readACDir(IRSeeker) != 0)
 	{
-		//Take Outside Left Turn //
-		while(HTIRS2readACDir(IRSeeker) != stopTurn)
-			InsideLeftTurn(false);
-	}
+		nMotorEncoder[leftMotor] = 0;
+		int startTurn = 8; // IRSeeker indicates far left
+		while(HTIRS2readACDir(IRSeeker) < startTurn )
+			driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
 
-	///// PLACEHOLDER FOR DUMPING ROUTINE /////
-	driveMotors(0,0,-1);
-	FlashLights(5,50);
-	///////////////////////////////////////////
-
-	// Return to Starting Point //
-	while(HTIRS2readACDir(IRSeeker) != startTurn)
-	{
-		if(encoderAtTurn < 3000)
-			OutsideLeftTurn(true);
+		int encoderAtTurn = nMotorEncoder[leftMotor];
+		motorEncoder_out = nMotorEncoder[leftMotor];
+		int stopTurn = 5;
+		if(nMotorEncoder[leftMotor] < WALL_TO_MID)
+		{
+			//Take Inside Left Turn //
+			while(HTIRS2readACDir(IRSeeker) != stopTurn)
+				OutsideLeftTurn(false);
+	  }
 		else
-			InsideLeftTurn(true);
-	}
-	while(nMotorEncoder[leftMotor] > 0)
-		driveMotors(-HALF_IMPULSE,-HALF_IMPULSE,-1);
+		{
+			//Take Outside Left Turn //
+			while(HTIRS2readACDir(IRSeeker) != stopTurn)
+				InsideLeftTurn(false);
+		}
 
-	driveMotors(0,0,-1);
+		///// PLACEHOLDER FOR DUMPING ROUTINE /////
+		driveMotors(0,0,-1);
+		FlashLights(5,50);
+		///////////////////////////////////////////
+
+		// Return to Starting Point //
+		while(HTIRS2readACDir(IRSeeker) != startTurn)
+		{
+			if(encoderAtTurn < 3000)
+				OutsideLeftTurn(true);
+			else
+				InsideLeftTurn(true);
+		}
+		while(nMotorEncoder[leftMotor] > 0)
+			driveMotors(-HALF_IMPULSE,-HALF_IMPULSE,-1);
+
+		driveMotors(0,0,-1);
+	}
 }
+// Start Same as OnFlagLineRightCorner_Basket //
+// Turns, finds line, follows line up on ramp and stops //
 void OnFlagLineRightCorner_Ramp()
 {
 	// Turn Left Dead Reckoning //
@@ -213,6 +209,7 @@ void OnFlagLineRightCorner_Ramp()
 		driveMotors(QUARTER_IMPULSE,-QUARTER_IMPULSE,-1);
 	driveMotors(0,0,200);
 
+	// Line Up With Line //
 	while(LSvalRaw(lightRight) < 475)
 	{
 		if(LSvalRaw(lightRight) < 320)
@@ -228,7 +225,7 @@ void OnFlagLineRightCorner_Ramp()
 	nMotorEncoder[leftMotor] = 0;
 
 	// Follow Line To Ramp //
-	while(nMotorEncoder[leftMotor] < 3000)
+	while(nMotorEncoder[leftMotor] < 3500)
 		FollowLine(475);
 
 	driveMotors(0,0,-1);
@@ -236,21 +233,6 @@ void OnFlagLineRightCorner_Ramp()
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                         Main Task
-//
-// The following is the main code for the autonomous robot operation. Customize as appropriate for
-// your specific robot.
-//
-// The types of things you might do during the autonomous phase (for the 2008-9 FTC competition)
-// are:
-//
-//   1. Have the robot follow a line on the game field until it reaches one of the puck storage
-//      areas.
-//   2. Load pucks into the robot from the storage bin.
-//   3. Stop the robot and wait for autonomous phase to end.
-//
-// This simple template does nothing except play a periodic tone every few seconds.
-//
-// At the end of the autonomous period, the FMS will autonmatically abort (stop) execution of the program.
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 task main()
@@ -270,6 +252,8 @@ task main()
 		motorEncoder_out = nMotorEncoder[leftMotor];
 		motorEncoder_inches = B2I(motorEncoder_out);
 
+		//Note: OnWallFacingFlag is no longer a method
+		/*
 		// Start: Right side on wall with front of robot facing flag.
 		if(joy1Btn(1) == 1) // X //
 		{
@@ -277,20 +261,33 @@ task main()
 			OnWallFacingFlag();
 			StartTask(Drive);
 		}
+		*/
 
-		// Start: right wheels aligned with flag line. Back right wheel touching wall.
+		// Basket Routine Only //
 		if(joy1Btn(2) == 1) // A //
 		{
 			StopTask(Drive);
 			OnFlagLineRightCorner_Basket();
 			StartTask(Drive);
 		}
+
+		// Ramp Routine Only //
 		if(joy1Btn(3) == 1) // B //
 		{
 			StopTask(Drive);
 			OnFlagLineRightCorner_Ramp();
 			StartTask(Drive);
 		}
+
+		// Run Full Autonomous Routine //
+		if(joy1Btn(4) == 1) // Y //
+		{
+			StopTask(Drive);
+			OnFlagLineRightCorner_Basket();
+			OnFlagLineRightCorner_Ramp();
+			StartTask(Drive);
+		}
+
 		if(joy1Btn(9) == 1)
 			nMotorEncoder[leftMotor] = 0;
 

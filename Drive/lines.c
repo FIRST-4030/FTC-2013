@@ -1,14 +1,9 @@
 // Store the light sensor ports for use in line functions
-tSensors lineLeft  = null;
-tSensors lineRight = null;
+tSensors lineLeft;
+tSensors lineRight;
 void setLineSensors(tSensors left, tSensors right) {
 	lineLeft  = left;
 	lineRight = right;
-}
-
-// Follow a line, after we've been aligned to it, stopping when we hit the STOP color
-void followLineToColor(FloorColor color, int speed, FloorColor stop) {
-	_folowLine(color, speed, stop, 0, 0);
 }
 
 // Follow a line, after we've been aligned to it, stopping based on color, distance, or time
@@ -17,10 +12,10 @@ void _followLine(FloorColor color, int speed, FloorColor stopColor, int stopDist
 	if (stopDistance != 0) {
 		resetDriveEncoder();
 	}
-	
+
 	// Loop until we hit a stop condition
 	while (true) {
-		if (stopColor != UNKNOWN && (onColor(stop, LSvalRaw(lineLeft)) || onColor(stop, LSvalRaw(lineRight)))) {
+		if (stopColor != UNKNOWN && (onColor(stopColor, LSvalRaw(lineLeft)) || onColor(stopColor, LSvalRaw(lineRight)))) {
 			break;
 		} else if (stopDistance > 0 && readDriveEncoder() > stopDistance) {
 			break;
@@ -39,22 +34,22 @@ void _followLine(FloorColor color, int speed, FloorColor stopColor, int stopDist
 			runDriveMotors(speed, speed);
 		}
 	}
-	
+
 	// Always stop when we're done
 	stopDriveMotors();
 }
 
-// Align to a line, assuming we start at or just beyond it
-void alignLine(FloorColor color, int speed) {
-	_alignLine(color, speed, UNKNOWN);
+// Follow a line, after we've been aligned to it, stopping when we hit the STOP color
+void followLineToColor(FloorColor color, int speed, FloorColor stop) {
+	_followLine(color, speed, stop, 0, 0);
 }
 
 // Align to a line, assuming we start at or just beyond it, but stop if we hit the STOP color with either sensor
 void _alignLine(FloorColor color, int speed, FloorColor stop) {
-	
+
 	// When the right sensor is on the line, we're aligned
 	while(!onColor(color, LSvalRaw(lineRight))) {
-		
+
 		// Stop alignment efforts if we hit the specified stop floor color
 		if (stop != UNKNOWN && (onColor(stop, LSvalRaw(lineLeft)) || onColor(stop, LSvalRaw(lineRight)))) {
 			break;
@@ -70,7 +65,12 @@ void _alignLine(FloorColor color, int speed, FloorColor stop) {
 			runDriveMotors(speed, 0);
 		}
 	}
-	
+
 	// Always stop when we're done
 	stopDriveMotors();
+}
+
+// Align to a line, assuming we start at or just beyond it
+void alignLine(FloorColor color, int speed) {
+	_alignLine(color, speed, UNKNOWN);
 }

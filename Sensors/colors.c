@@ -1,6 +1,3 @@
-// Set this to select a configuration set
-#define LIGHT_SENSOR_CONFIG_1
-
 // Which colors can we detect
 typedef enum {
 	BLACK,
@@ -10,7 +7,7 @@ typedef enum {
 	RED,
 	UNKNOWN
 } FloorColor;
-const int NUM_COLORS = 5;
+const FloorColor NUM_COLORS = 5;
 
 // Each color has a min and max value
 typedef struct {
@@ -21,52 +18,44 @@ typedef struct {
 // Global storage for our configured color set
 ColorRange COLORS[NUM_COLORS];
 
-// Configuration data set 1
-#ifdef LIGHT_SENSOR_CONFIG_1
-colors[BLACK].min = 0;
-colors[BLACK].max = 100;
-colors[WHITE].min = 401;
-colors[WHITE].max = 10000;
-colors[GREY].min  = 101;
-colors[GREY].max  = 200;
-colors[BLUE].min  = 201;
-colors[BLUE].max  = 300;
-colors[RED].min   = 301;
-colors[RED].max   = 400;
-#endif
-
-// Configuration data set 2
-#ifdef LIGHT_SENSOR_CONFIG_2
-colors[BLACK].min = 0;
-colors[BLACK].max = 100;
-colors[WHITE].min = 401;
-colors[WHITE].max = 10000;
-colors[GREY].min  = 101;
-colors[GREY].max  = 200;
-colors[BLUE].min  = 201;
-colors[BLUE].max  = 300;
-colors[RED].min   = 301;
-colors[RED].max   = 400;
-#endif
-
-// Prototypes
-FloorColor floorColor(int);
-bool onColor(FloorColor, int);
-bool onBlack(int);
-bool onWhite(int);
-bool onGrey(int);
-bool onBlue(int);
-bool onRed(int);
-
-// Determine the color under the sensor
-FloorColor floorColor(int sensorVal) {
-	int i = 0;
-	for (i = 0; i < NUM_COLORS; i++) {
-		if (onColor(i, sensorVal)) {
-			return i;
-		}
+void setLightSensorHeight(float height) {
+	// 0.5" calibration
+	if (height <= 0.75) {
+		COLORS[BLACK].min = 320;
+		COLORS[BLACK].max = 335;
+		COLORS[BLUE].min  = 340;
+		COLORS[BLUE].max  = 365;
+		COLORS[GREY].min  = 410;
+		COLORS[GREY].max  = 435;
+		COLORS[RED].min   = 505;
+		COLORS[RED].max   = 520;
+		COLORS[WHITE].min = 550;
+		COLORS[WHITE].max = 585;
+	// 1.0" calibration
+	} else if (height >= 1.25) {
+		COLORS[BLACK].min = 270;
+		COLORS[BLACK].max = 350;
+		COLORS[BLUE].min  = 322;
+		COLORS[BLUE].max  = 350;
+		COLORS[GREY].min  = 360;
+		COLORS[GREY].max  = 395;
+		COLORS[RED].min   = 420;
+		COLORS[RED].max   = 465;
+		COLORS[WHITE].min = 475;
+		COLORS[WHITE].max = 515;
+	// 1.5" calibration
+	} else {
+		COLORS[BLACK].min = 250;
+		COLORS[BLACK].max = 300;
+		COLORS[BLUE].min  = 290;
+		COLORS[BLUE].max  = 320;
+		COLORS[GREY].min  = 340;
+		COLORS[GREY].max  = 365;
+		COLORS[RED].min   = 380;
+		COLORS[RED].max   = 420;
+		COLORS[WHITE].min = 430;
+		COLORS[WHITE].max = 480;
 	}
-	return UNKNOWN;
 }
 
 // Determine if the floor matches the indicated color
@@ -76,6 +65,17 @@ bool onColor(FloorColor color, int sensorVal) {
 		onColor = true;
 	}
 	return onColor;
+}
+
+// Determine the color under the sensor
+FloorColor floorColor(int sensorVal) {
+	int color;
+	for (color = 0; color < NUM_COLORS; color++) {
+		if (onColor(color, sensorVal)) {
+			return (FloorColor)color;
+		}
+	}
+	return UNKNOWN;
 }
 
 bool onBlack(int sensorVal) {

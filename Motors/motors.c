@@ -1,6 +1,6 @@
 // Store the motor ports for use in drive functions
-tMotor driveLeft  = null;
-tMotor driveRight = null;
+tMotor driveLeft;
+tMotor driveRight;
 void setDriveMotors(tMotor left, tMotor right) {
 	driveLeft  = left;
 	driveRight = right;
@@ -9,17 +9,17 @@ void setDriveMotors(tMotor left, tMotor right) {
 // Run motors at the specified speed indefinately
 void runDriveMotors(int left, int right) {
 	motor[driveLeft]  = left;
-	motor[driveRight] = right;	
+	motor[driveRight] = right;
 }
 
 // Stop all drive motion
 void stopDriveMotors() {
-	runMotors(0, 0);
+	runDriveMotors(0, 0);
 }
 
 // Run motors at the specified speed, stopping after DURATION milliseconds
 void driveMotors(int left, int right, const int duration) {
-	runMotors(left, right);
+	runDriveMotors(left, right);
 	if (duration >= 0) {
 		wait1Msec(duration);
 	}
