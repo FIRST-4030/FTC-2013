@@ -188,15 +188,18 @@ void OnFlagLineRightCorner_Basket()  //Add a bool variable that can be passed an
 }
 // Start Same as OnFlagLineRightCorner_Basket //
 // Turns, finds line, follows line up on ramp and stops //
-void OnFlagLineRightCorner_Ramp() {
+void OnFlagLineRightCorner_Ramp(bool reverse = false) {
 	// Turn Left Dead Reckoning //
-	driveMotors(-1 * HALF_IMPULSE, HALF_IMPULSE, 850);
+	if(reverse)
+		driveMotors(HALF_IMPULSE,-1 * HALF_IMPULSE, 850);
+	else
+		driveMotors(-1 * HALF_IMPULSE, HALF_IMPULSE, 850);
 
 	// Forward to white line
 	driveToColor(WHITE, QUARTER_IMPULSE);
 
 	// Align with white line
-	alignLine(WHITE, QUARTER_IMPULSE);
+	alignLine(WHITE, QUARTER_IMPULSE, reverse);
 
 	// Follow line to ramp
 	followLineToColor(WHITE, HALF_IMPULSE, BLACK);
@@ -290,18 +293,7 @@ task main()
 		if(joystick.joy1_TopHat == 2) // top-hat RIGHT
 		{
 			StopTask(Drive);
-			OnFlagLineRightCorner_Basket(); // Will return without running if no IR signal
-			OnFlagLineRightCorner_Ramp();
-			StartTask(Drive);
-			FlashLights(2,250);
-		}
-
-		if(joystick.joy1_TopHat == 6) // top-hat LEFT
-		{
-			StopTask(Drive);
-			driveToColor(WHITE, QUARTER_IMPULSE);
-			alignLine(WHITE, QUARTER_IMPULSE);
-			followLineToColor(WHITE, HALF_IMPULSE, BLACK);
+			OnFlagLineRightCorner_Ramp(true);
 			StartTask(Drive);
 			FlashLights(2,250);
 		}
