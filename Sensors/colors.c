@@ -17,10 +17,14 @@ typedef struct {
 
 // Global storage for our configured color set
 ColorRange COLORS[NUM_COLORS];
+int IR_out = 0;
+int Sonar_out = 0;
+int LightRight_out = 0;
+int LightLeft_out = 0;
 
 void setLightSensorHeight(float height) {
 	// 0.5" calibration
-	if (height <= 0.75) {
+	if (height == 0.5) {
 		COLORS[BLACK].min = 320;
 		COLORS[BLACK].max = 335;
 		COLORS[BLUE].min  = 340;
@@ -32,7 +36,7 @@ void setLightSensorHeight(float height) {
 		COLORS[WHITE].min = 550;
 		COLORS[WHITE].max = 585;
 	// 1.0" calibration
-	} else if (height >= 1.25) {
+	} else if (height == 1.0) {
 		COLORS[BLACK].min = 270;
 		COLORS[BLACK].max = 350;
 		COLORS[BLUE].min  = 322;
@@ -44,7 +48,7 @@ void setLightSensorHeight(float height) {
 		COLORS[WHITE].min = 475;
 		COLORS[WHITE].max = 515;
 	// 1.5" calibration
-	} else {
+	} else if (height == 1.5) {
 		COLORS[BLACK].min = 250;
 		COLORS[BLACK].max = 300;
 		COLORS[BLUE].min  = 290;
@@ -55,6 +59,17 @@ void setLightSensorHeight(float height) {
 		COLORS[RED].max   = 420;
 		COLORS[WHITE].min = 430;
 		COLORS[WHITE].max = 480;
+	} else {
+		COLORS[BLACK].min = 275;
+		COLORS[BLACK].max = 320;
+		COLORS[BLUE].min  = 300;
+		COLORS[BLUE].max  = 330;
+		COLORS[GREY].min  = 360;
+		COLORS[GREY].max  = 390;
+		COLORS[RED].min   = 420;
+		COLORS[RED].max   = 450;
+		COLORS[WHITE].min = 475;
+		COLORS[WHITE].max = 505;
 	}
 }
 

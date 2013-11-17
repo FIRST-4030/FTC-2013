@@ -18,7 +18,7 @@ void _followLine(FloorColor color, int speed, FloorColor stopColor, int stopDist
 
 	// Loop until we hit a stop condition
 	while (true) {
-		if (stopColor != UNKNOWN && (onColor(stopColor, LSvalRaw(lineLeft)) || onColor(stopColor, LSvalRaw(lineRight)))) {
+		if (stopColor != UNKNOWN && (onColor(stopColor, LSvalRaw(lineRight)))) {
 			break;
 		} else if (stopDistance > 0 && readDriveEncoder() > stopDistance) {
 			break;
@@ -79,8 +79,8 @@ void _alignLine(FloorColor color, int speed, FloorColor stop, bool reverse) {
 		}
 
 		// Move forward while the left sensor is on the line
-		while(onColor(color, LSvalRaw(front))) {
-			runDriveMotors(speed, speed);
+		while(!onColor(GREY, LSvalRaw(front))) { // NEED TO DETECT COMPLETELY OFF WHITE
+			runDriveMotors(0.5*speed, 0.5*speed);
 		}
 		stopDriveMotors();
 
