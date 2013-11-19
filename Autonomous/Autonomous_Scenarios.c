@@ -190,25 +190,23 @@ void OnFlagLineRightCorner_Basket()  //Add a bool variable that can be passed an
 // Turns, finds line, follows line up on ramp and stops //
 void OnFlagLineRightCorner_Ramp(bool reverse = false) {
 	// Turn Left Dead Reckoning //
-	if(reverse)
+	if (reverse) {
 		driveMotors(HALF_IMPULSE,-1 * HALF_IMPULSE, 850);
-	else
+	} else {
 		driveMotors(-1 * HALF_IMPULSE, HALF_IMPULSE, 850);
+	}
 
 	// Forward to white line
 	driveToColor(WHITE, QUARTER_IMPULSE);
-	// When reversing, drive the second sensor to the line before we start
-	// This mirrors the starting position of a forward align
-	driveToColor(WHITE, QUARTER_IMPULSE);
 
 	// Align with white line
-	alignLine(WHITE, QUARTER_IMPULSE, reverse);
+	alignLine(WHITE, QUARTER_IMPULSE, BLACK, reverse);
 
 	// Follow line to ramp
 	followLineToColor(WHITE, HALF_IMPULSE, BLACK);
 
 	// Rear Light Sensor is Mounted about 2" in front of wheels //
-	driveMotors(FULL_IMPULSE,FULL_IMPULSE,100);
+	driveMotors(FULL_IMPULSE, FULL_IMPULSE, 100);
 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////
