@@ -18,7 +18,7 @@ void _followLine(FloorColor color, int speed, FloorColor stopColor, int stopDist
 
 	// Loop until we hit a stop condition
 	while (true) {
-		if (stopColor != UNKNOWN && (onColor(stopColor, LSvalRaw(lineLeft)) || onColor(stopColor, LSvalRaw(lineRight)))) {
+		if (stopColor != UNKNOWN && (onColor(stopColor, LSvalRaw(lineRight)))) {
 			break;
 		} else if (stopDistance > 0 && readDriveEncoder() > stopDistance) {
 			break;
@@ -59,8 +59,8 @@ void _alignLine(FloorColor color, int speed, FloorColor stop, bool reverse) {
 	LIGHT_SENSOR_PORT_TYPE front = lineLeft;
 	LIGHT_SENSOR_PORT_TYPE back  = lineRight;
 	if (reverse) {
-		LIGHT_SENSOR_PORT_TYPE front = lineLeft;
-		LIGHT_SENSOR_PORT_TYPE back  = lineRight;
+		front = lineLeft;
+		back  = lineRight;
 		speed *= -1;
 	}
 
@@ -79,14 +79,17 @@ void _alignLine(FloorColor color, int speed, FloorColor stop, bool reverse) {
 		}
 
 		// Move forward while the left sensor is on the line
-		while(onColor(color, LSvalRaw(front))) {
-			runDriveMotors(speed, speed);
+		while(!onColor(GREY, LSvalRaw(front))) { // NEED TO DETECT COMPLETELY OFF WHITE
+			runDriveMotors(abs(0.5*speed), abs(0.5*speed));
 		}
 		stopDriveMotors();
 
 		// Turn clockwise (right) when neither sensor is on the line
 		while(!onColor(color, LSvalRaw(front)) && !onColor(color, LSvalRaw(back))) {
-			runDriveMotors(speed, 0);
+			if(!reverse)
+				runDriveMotors(speed, 0);
+			else
+				runDriveMotors(0, -1 * speed);
 		}
 		stopDriveMotors();
 	}
@@ -96,6 +99,7 @@ void _alignLine(FloorColor color, int speed, FloorColor stop, bool reverse) {
 }
 
 // Align to a line, assuming we start at or just beyond it
-void alignLine(FloorColor color, int speed) {
-	_alignLine(color, speed, UNKNOWN, false);
+void alignLine(FloorColor color, int speed, bool reverse = false) {
+		_alignLine(color, speed, UNKNOWN, reverse);
+
 }

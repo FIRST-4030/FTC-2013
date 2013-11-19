@@ -34,10 +34,6 @@ const tMUXSensor lightLeft = msensor_S2_4;
 #define EIGHTH_IMPULSE (12)
 #define WALL_TO_MID (3000)
 
-int IR_out = 0;
-int Sonar_out = 0;
-int LightRight_out = 0;
-int LightLeft_out = 0;
 int motorEncoder_out = 0;
 int motorEncoder_inches = 0;
 int B2I(int x)
@@ -68,7 +64,7 @@ void FlashLights(int times, int delay)
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 void initializeRobot() {
 	// Initialize the sensor and motor configuration
-	setLightSensorHeight(1.5);
+	setLightSensorHeight(5.0);
 	setDriveMotors(leftMotor, rightMotor);
 	setLineSensors(lightLeft, lightRight);
 
@@ -192,27 +188,72 @@ void OnFlagLineRightCorner_Basket()  //Add a bool variable that can be passed an
 }
 // Start Same as OnFlagLineRightCorner_Basket //
 // Turns, finds line, follows line up on ramp and stops //
-void OnFlagLineRightCorner_Ramp() {
+void OnFlagLineRightCorner_Ramp(bool reverse = false) {
 	// Turn Left Dead Reckoning //
-	driveMotors(-1 * HALF_IMPULSE, HALF_IMPULSE, 850);
+	if(reverse)
+		driveMotors(HALF_IMPULSE,-1 * HALF_IMPULSE, 850);
+	else
+		driveMotors(-1 * HALF_IMPULSE, HALF_IMPULSE, 850);
 
 	// Forward to white line
-	driveToColor(WHITE, HALF_IMPULSE);
+	driveToColor(WHITE, QUARTER_IMPULSE);
 
 	// Align with white line
-	alignLine(WHITE, QUARTER_IMPULSE);
+	alignLine(WHITE, QUARTER_IMPULSE, reverse);
 
 	// Follow line to ramp
 	followLineToColor(WHITE, HALF_IMPULSE, BLACK);
 
-	// Drive up ramp
-	followLineToDistance(WHITE, HALF_IMPULSE, 3500);
+	// Rear Light Sensor is Mounted about 2" in front of wheels //
+	driveMotors(FULL_IMPULSE,FULL_IMPULSE,100);
+
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                         Main Task
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
+void CalibrateColors()
+{
+	FlashLights(3,250);
+	getJoystickSettings(joystick);
+	while(joy1Btn(10) != 1)
+	{
+		// black // A
+		if(joy1Btn(2) == 1)
+		{
+			COLORS[BLACK].min = LSvalRaw(lightLeft)-10;
+			COLORS[BLACK].max = LSvalRaw(lightRight)+10;
+			FlashLights(2,250);
+		}
+		// white // Y
+		if(joy1Btn(4) == 1)
+		{
+			COLORS[WHITE].min = LSvalRaw(lightLeft)-10;
+			COLORS[WHITE].max = LSvalRaw(lightRight)+10;
+			FlashLights(2,250);
+		}
+		// red // B
+		if(joy1Btn(3) == 1)
+		{
+			COLORS[RED].min = LSvalRaw(lightLeft)-10;
+			COLORS[RED].max = LSvalRaw(lightRight)+10;
+			FlashLights(2,250);
+		}
+		// blue // X
+		if(joy1Btn(1) == 1)
+		{
+			COLORS[BLUE].min = LSvalRaw(lightLeft)-10;
+			COLORS[BLUE].max = LSvalRaw(lightRight)+10;
+			FlashLights(2,250);
+		}
+	}
+	// gray // start
+	COLORS[GREY].min = LSvalRaw(lightLeft)-10;
+	COLORS[GREY].max = LSvalRaw(lightRight)+10;
+	FlashLights(3,250);
+}
+
 task main()
 {
   initializeRobot();
@@ -230,48 +271,40 @@ task main()
 		motorEncoder_out = nMotorEncoder[leftMotor];
 		motorEncoder_inches = B2I(motorEncoder_out);
 
-		//Note: OnWallFacingFlag is no longer a method
-		/*
-		// Start: Right side on wall with front of robot facing flag.
-		if(joy1Btn(1) == 1) // X //
-		{
-			StopTask(Drive);
-			OnWallFacingFlag();
-			StartTask(Drive);
-		}
-		*/
-
 		// Basket Routine Only //
-		if(joy1Btn(2) == 1) // A //
+		if(joystick.joy1_TopHat == 1) // top-hat UP
 		{
 			StopTask(Drive);
 			OnFlagLineRightCorner_Basket();
 			StartTask(Drive);
+			FlashLights(2,250);
 		}
 
 		// Ramp Routine Only //
-		if(joy1Btn(3) == 1) // B //
+		if(joystick.joy1_TopHat == 4) // top-hat DOWN
 		{
 			StopTask(Drive);
 			OnFlagLineRightCorner_Ramp();
 			StartTask(Drive);
+			FlashLights(2,250);
 		}
 
 		// Run Full Autonomous Routine //
-		if(joy1Btn(4) == 1) // Y //
+		if(joystick.joy1_TopHat == 2) // top-hat RIGHT
 		{
 			StopTask(Drive);
-			OnFlagLineRightCorner_Basket();
-			OnFlagLineRightCorner_Ramp();
+			OnFlagLineRightCorner_Ramp(true);
 			StartTask(Drive);
+			FlashLights(2,250);
 		}
 
-		if(joy1Btn(9) == 1)
+		if(joy1Btn(9) == 1) // Back button
 			nMotorEncoder[leftMotor] = 0;
 
-		if(joy1Btn(10) == 1) // Start Button // Reinitialize Robot //
-			initializeRobot();
+//		if(joy1Btn(10) == 1) // Start Button // Reinitialize Robot //
+	//		initializeRobot();
+
+		if(joy1Btn(12) == 1) // Right Joystick Button
+			CalibrateColors();
 	}
-  //lined up and ready to find IR sensor
-  //	goToBasket(SensorValue[IRSeeker]);
 }
