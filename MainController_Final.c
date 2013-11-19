@@ -35,7 +35,13 @@ Main Robot Code
 /*///////////////////////////////
 #pragma debuggerWindows("joystickSimple");
 #include "drivers/hitechnic-sensormux.h"
+#include "drivers/lego-light.h"
 #include "JoystickDriver.c"
+
+#define FULL_IMPULSE (100)
+#define HALF_IMPULSE (50)
+#define QUARTER_IMPULSE (25)
+#define EIGHTH_IMPULSE (12)
 
 ///// Sensor Multiplexer Interface /////
 const tMUXSensor sonar = msensor_S2_1;
@@ -188,19 +194,19 @@ void DriveHopperServos()
 	getJoystickSettings(joystick);
 	if(joy2Btn(1) == 1) {
 		servo[leftHopper] = 50;
-		servo[rightHopper] 50;
+		servo[rightHopper] = 50;
 	}
 	else {
 		servo[leftHopper] = 0;
-		servo[rightHopper] 0;
+		servo[rightHopper] = 0;
 	}
 	if(joy2Btn(2) == 1) {
 		servo[leftHopper] = -50;
-		servo[rightHopper] -50;
+		servo[rightHopper] = -50;
 	}
 	else {
 		servo[leftHopper] = 0;
-		servo[rightHopper] 0;
+		servo[rightHopper] = 0;
 	}
 }
 
@@ -228,7 +234,7 @@ task Drive()
 {
 	while(true)
 	{
-		DriveLeftSide();
+	DriveLeftSide();
 		DriveRightSide();
 		DriveSpinnerMotor();
 		DriveFlagMotor();
