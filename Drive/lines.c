@@ -59,10 +59,16 @@ void _alignLine(FloorColor color, int speed, FloorColor stop, bool reverse) {
 	LIGHT_SENSOR_PORT_TYPE front = lineLeft;
 	LIGHT_SENSOR_PORT_TYPE back  = lineRight;
 	if (reverse) {
-		front = lineLeft;
-		back  = lineRight;
+		front = lineRight;
+		back  = lineLeft;
 		speed *= -1;
 	}
+
+	// Move forward while the front sensor is on the line
+	// Plus a little static boost, since we generally overshoot
+	runDriveMotors(speed, speed);
+	wait1Msec(250);
+	stopDriveMotors();
 
 	// Start our turn to get the front sensor back on the line
 	while(!onColor(color, LSvalRaw(front))) {
@@ -78,18 +84,19 @@ void _alignLine(FloorColor color, int speed, FloorColor stop, bool reverse) {
 			break;
 		}
 
-		// Move forward while the left sensor is on the line
+		// Drive forward until the front sensor is clear of the line
 		while(!onColor(GREY, LSvalRaw(front))) { // NEED TO DETECT COMPLETELY OFF WHITE
-			runDriveMotors(abs(0.5*speed), abs(0.5*speed));
+			runDriveMotors(speed, speed);
 		}
 		stopDriveMotors();
 
-		// Turn clockwise (right) when neither sensor is on the line
+		// Turn while neither sensor is on the line
 		while(!onColor(color, LSvalRaw(front)) && !onColor(color, LSvalRaw(back))) {
-			if(!reverse)
+			if (!reverse) {
 				runDriveMotors(speed, 0);
-			else
+			} else {
 				runDriveMotors(0, -1 * speed);
+			}
 		}
 		stopDriveMotors();
 	}

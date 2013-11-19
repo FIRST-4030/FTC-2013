@@ -197,6 +197,9 @@ void OnFlagLineRightCorner_Ramp(bool reverse = false) {
 
 	// Forward to white line
 	driveToColor(WHITE, QUARTER_IMPULSE);
+	// When reversing, drive the second sensor to the line before we start
+	// This mirrors the starting position of a forward align
+	driveToColor(WHITE, QUARTER_IMPULSE);
 
 	// Align with white line
 	alignLine(WHITE, QUARTER_IMPULSE, reverse);
