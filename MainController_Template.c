@@ -35,6 +35,7 @@ Main Robot Code
 /*///////////////////////////////
 #pragma debuggerWindows("joystickSimple");
 #include "drivers/hitechnic-sensormux.h"
+#include "drivers/lego-light.h"
 #include "JoystickDriver.c"
 
 ///// Sensor Multiplexer Interface /////
@@ -42,6 +43,18 @@ const tMUXSensor sonar = msensor_S2_1;
 const tMUXSensor IRSeeker = msensor_S2_2;
 const tMUXSensor lightRight = msensor_S2_3;
 const tMUXSensor lightLeft = msensor_S2_4;
+
+const int SERVO_ADJUST = 1;
+int leftHookVal = 0;
+int rightHookVal = 0;
+int leftHopperVal = 0;
+int rightHopperVal = 0;
+
+void MoveHookServo(int leftTarget, int rightTarget)
+{
+	servo[leftHook] = leftTarget;
+	servo[rightHook] = rightTarget;
+}
 
 ////////////////////////////////
 ///// ROBOT INITIALIZATION /////
@@ -57,6 +70,15 @@ void initializeRobot()
 	motor[rightFrontMotor] = 0;
 	motor[rightRearMotor] = 0;
 	motor[spinnerMotor] = 0;
+	motor[liftMotor] = 0;
+
+	MoveHookServo(200,200);
+	wait1Msec(100);
+	leftHookVal = servo[leftHook];
+	rightHookVal = servo[rightHook];
+//	leftHopperVal = servo[leftHopper];
+//	rightHopperVal = servo[rightHopper];
+
 
 	// Cycle Light Sensor Lights //
 	// Indicates Initialization Complete //
@@ -108,7 +130,7 @@ task main()
   initializeRobot();
   //waitForStart(); // Wait for the beginning of autonomous phase.
 
-  StartTask(Drive);
+  //StartTask(Drive);
 
   int threshold = 10;
 	//Loop Forever
@@ -116,16 +138,19 @@ task main()
 	{
 		//Get the Latest joystick values
 		getJoystickSettings(joystick);
+		leftHookVal = ServoValue[leftHook];
+		rightHookVal = ServoValue[rightHook];
+		leftHopperVal = servo[leftHopper];
+		rightHopperVal = servo[rightHopper];
+		if(joy1Btn(2) == 1)
+		{
+			MoveHookServo(100,100);
+		}
+		else if(joy1Btn(3) == 1)
+		{
+			MoveHookServo(150,150);
+		}
 
-		// Lift Motor Control //
-		if(abs(joystick.joy1_y1) > threshold )
-		{
-			MoveLiftMotor(joystick.joy1_y1,-1);
-		}
-		else
-		{
-			MoveLiftMotor(0,-1);
-		}
 
 		if(joy1Btn(10) == 1)
 			initializeRobot();

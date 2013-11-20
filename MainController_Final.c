@@ -44,6 +44,11 @@ Main Robot Code
 #define QUARTER_IMPULSE (25)
 #define EIGHTH_IMPULSE (12)
 const int TEST_IMPULSE = 50;
+const int SERVO_ADJUST = 1;
+int leftHookVal = 0;
+int rightHookVal = 0;
+int leftHopperVal = 0;
+int rightHopperVal = 0;
 
 ///// Sensor Multiplexer Interface /////
 const tMUXSensor sonar = msensor_S2_1;
@@ -65,6 +70,13 @@ void initializeRobot()
 	motor[rightFrontMotor] = 0;
 	motor[rightRearMotor] = 0;
 	motor[spinnerMotor] = 0;
+	motor[liftMotor] = 0;
+
+	// Hold All Servos Steady //
+	leftHookVal = servo[leftHook];
+	rightHookVal = servo[rightHook];
+	leftHopperVal = servo[leftHopper];
+	rightHopperVal = servo[rightHopper];
 
 	// Cycle Light Sensor Lights //
 	// Indicates Initialization Complete //
@@ -110,16 +122,16 @@ void DriveWinchMotors(int power)
 	motor[rightWinch] = power;
 }
 
-void DriveHookServos(int power)
+void DriveHookServos(int leftPower, int rightPower)
 {
-	servo[leftHook] = power;
-	servo[rightHook] = power;
+	servo[leftHook] = leftPower;
+	servo[rightHook] = rightPower;
 }
 
-void DriveHopperServos(int power)
+void DriveHopperServos(int leftPower, int rightPower)
 {
-	servo[leftHopper] = power;
-	servo[rightHopper] = power;
+	servo[leftHopper] = leftPower;
+	servo[rightHopper] = rightPower;
 }
 
 void DriveLiftMotor(int power)
@@ -131,11 +143,11 @@ void DriveLiftMotor(int power)
 ///// DRIVE TASK /////
 task Drive()
 {
+	//Integer variable that allows you to specify a "deadzone" where values (both positive or negative)
+	//less than the threshold will be ignored.
+	int threshold = 10;
 	while(true)
 	{
-		//Integer variable that allows you to specify a "deadzone" where values (both positive or negative)
-		//less than the threshold will be ignored.
-		int threshold = 10;
 		//Get the Latest joystick values
 		getJoystickSettings(joystick);
 
@@ -154,6 +166,21 @@ task Drive()
 		else {
 			DriveRightSide(0);
 		}
+	}
+}
+
+task main()
+{
+  initializeRobot();
+  //waitForStart(); // Wait for the beginning of autonomous phase.
+
+  StartTask(Drive);
+
+  int threshold = 10;
+	//Not really sure what this loop is here for, going to leave it in just in case
+	while(true)
+	{
+		getJoystickSettings(joystick);
 		//Spinner
 		if(abs(joystick.joy2_y1) > threshold) {
 			DriveSpinnerMotor(joystick.joy2_y1);
@@ -168,6 +195,7 @@ task Drive()
 		else {
 			DriveFlagMotor(0);
 		}
+
 		//Winches
 		if(joy2Btn(6) == 1) {
 			DriveWinchMotors(TEST_IMPULSE);
@@ -178,26 +206,34 @@ task Drive()
 		else {
 			DriveWinchMotors(0);
 		}
+		/* Do not mess with
 		//Hooks
 		if(joy2Btn(5) == 1) {
-			DriveHookServos(TEST_IMPULSE);
+			DriveHookServos(leftHookVal-SERVO_ADJUST,rightHookVal+SERVO_ADJUST);
+			leftHookVal = leftHookVal - SERVO_ADJUST;
+			rightHookVal = rightHookVal + SERVO_ADJUST;
 		}
 		else if(joy2Btn(7) == 1) {
-			DriveHookServos(-TEST_IMPULSE);
+			DriveHookServos(leftHookVal+SERVO_ADJUST,rightHookVal-SERVO_ADJUST);
+			leftHookVal = leftHookVal + SERVO_ADJUST;
+			rightHookVal = rightHookVal - SERVO_ADJUST;
 		}
 		else {
-			DriveHookServos(0);
 		}
 		//Hoppers
 		if(joy2Btn(1) == 1) {
-			DriveHopperServos(TEST_IMPULSE);
+			DriveHopperServos(leftHopperVal-SERVO_ADJUST,rightHopperVal+SERVO_ADJUST);
+			leftHopperVal = leftHopperVal - SERVO_ADJUST;
+			rightHopperVal = rightHopperVal + SERVO_ADJUST;
 		}
 		else if(joy2Btn(2) == 1) {
-			DriveHopperServos(-TEST_IMPULSE);
+			DriveHopperServos(leftHopperVal+SERVO_ADJUST,rightHopperVal-SERVO_ADJUST);
+			leftHopperVal = leftHopperVal + SERVO_ADJUST;
+			rightHopperVal = rightHopperVal - SERVO_ADJUST;
 		}
 		else {
-			DriveHopperServos(0);
 		}
+		*/
 		//Lift
 		if(joy2Btn(4) == 1) {
 			DriveLiftMotor(TEST_IMPULSE);
@@ -209,19 +245,5 @@ task Drive()
 			DriveLiftMotor(0);
 		}
 	}
-}
 
-task main()
-{
-  initializeRobot();
-  //waitForStart(); // Wait for the beginning of autonomous phase.
-
-  StartTask(Drive);
-
-  int threshold = 10;
-	/* Not really sure what this loop is here for, going to leave it in just in case
-	while(true)
-	{
-	}
-	*/
 }
