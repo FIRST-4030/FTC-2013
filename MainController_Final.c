@@ -38,10 +38,12 @@ Main Robot Code
 #include "drivers/lego-light.h"
 #include "JoystickDriver.c"
 
+///// CONSTANTS /////
 #define FULL_IMPULSE (100)
 #define HALF_IMPULSE (50)
 #define QUARTER_IMPULSE (25)
 #define EIGHTH_IMPULSE (12)
+const int TEST_IMPULSE = 50;
 
 ///// Sensor Multiplexer Interface /////
 const tMUXSensor sonar = msensor_S2_1;
@@ -80,152 +82,49 @@ void initializeRobot()
 	return;
 }
 
-void DriveLeftSide()
+void DriveLeftSide(int power)
 {
-	//Integer variable that allows you to specify a "deadzone" where values (both positive or negative)
-	//less than the threshold will be ignored.
-	int threshold = 10;
-	//Get the Latest joystick values
-	getJoystickSettings(joystick);
-	if(abs(joystick.joy1_y1) > threshold){
-		motor[leftFrontMotor] = joystick.joy1_y1;
-		motor[leftRearMotor] = joystick.joy1_y1;
-	}	else {
-		motor[leftFrontMotor] = 0;
-		motor[leftRearMotor] = 0;
-	}
+	motor[leftFrontMotor] = power;
+	motor[leftRearMotor] = power;
 }
 
-void DriveRightSide()
+void DriveRightSide(int power)
 {
-	//Integer variable that allows you to specify a "deadzone" where values (both positive or negative)
-	//less than the threshold will be ignored.
-	int threshold = 10;
-	//Get the Latest joystick values
-	getJoystickSettings(joystick);
-	if(abs(joystick.joy1_y2) > threshold) {
-		motor[rightFrontMotor] = joystick.joy1_y2;
-		motor[rightRearMotor] = joystick.joy1_y2;
-	} else {
-		motor[rightFrontMotor] = 0;
-		motor[rightRearMotor] = 0;
-	}
+	motor[rightFrontMotor] = power;
+	motor[rightRearMotor] = power;
 }
 
-void DriveSpinnerMotor()
+void DriveSpinnerMotor(int power)
 {
-	//Integer variable that allows you to specify a "deadzone" where values (both positive or negative)
-	//less than the threshold will be ignored.
-	int threshold = 10;
-	//Get the Latest joystick values
-	getJoystickSettings(joystick);
-	if(abs(joystick.joy2_y1) > threshold) {
-		motor[spinnerMotor] = joystick.joy2_y1;
-	}
-	else {
-		motor[spinnerMotor] = 0;
-	}
+	motor[spinnerMotor] = power;
 }
 
-void DriveFlagMotor()
+void DriveFlagMotor(int power)
 {
-	//Integer variable that allows you to specify a "deadzone" where values (both positive or negative)
-	//less than the threshold will be ignored.
-	int threshold = 10;
-	//Get the Latest joystick values
-	getJoystickSettings(joystick);
-	//Flag Motor only goes one direction
-	if(joystick.joy2_y2 > threshold) {
-		motor[flagMotor] = joystick.joy2_y2;
-	}
-	else {
-		motor[flagMotor] = 0;
-	}
+	motor[flagMotor] = power;
 }
 
-void DriveWinchMotors()
+void DriveWinchMotors(int power)
 {
-	//Get the Latest joystick values
-	getJoystickSettings(joystick);
-	if(joy2Btn(6) == 1) {
-		motor[leftWinch] = 50;
-		motor[rightWinch] = 50;
-	}
-	else {
-		motor[leftWinch] = 0;
-		motor[rightWinch] = 0;
-	}
-	if(joy2Btn(8) == 1) {
-		motor[leftWinch] = -50;
-		motor[rightWinch] = -50;
-	}
-	else {
-		motor[leftWinch] = 0;
-		motor[rightWinch] = 0;
-	}
+	motor[leftWinch] = power;
+	motor[rightWinch] = power;
 }
 
-void DriveHookServos()
+void DriveHookServos(int power)
 {
-	//Get the Latest joystick values
-	getJoystickSettings(joystick);
-	if(joy2Btn(5) == 1) {
-		servo[leftHook] = 50;
-		servo[rightHook] = 50;
-	}
-	else {
-		servo[leftHook] = 0;
-		servo[rightHook] = 0;
-	}
-	if(joy2Btn(7) == 1) {
-		servo[leftHook] = -50;
-		servo[rightHook] = -50;
-	}
-	else {
-		servo[leftHook] = 0;
-		servo[rightHook] = 0;
-	}
-
+	servo[leftHook] = power;
+	servo[rightHook] = power;
 }
 
-void DriveHopperServos()
+void DriveHopperServos(int power)
 {
-	//Get the Latest joystick values
-	getJoystickSettings(joystick);
-	if(joy2Btn(1) == 1) {
-		servo[leftHopper] = 50;
-		servo[rightHopper] = 50;
-	}
-	else {
-		servo[leftHopper] = 0;
-		servo[rightHopper] = 0;
-	}
-	if(joy2Btn(2) == 1) {
-		servo[leftHopper] = -50;
-		servo[rightHopper] = -50;
-	}
-	else {
-		servo[leftHopper] = 0;
-		servo[rightHopper] = 0;
-	}
+	servo[leftHopper] = power;
+	servo[rightHopper] = power;
 }
 
-void DriveLiftMotor()
+void DriveLiftMotor(int power)
 {
-	//Get the Latest joystick values
-	getJoystickSettings(joystick);
-	if(joy2Btn(4) == 1) {
-		motor[liftMotor] = 50;
-	}
-	else {
-		motor[liftMotor] = 0;
-	}
-	if(joy2Btn(3) == 1) {
-		motor[liftMotor] = -50;
-	}
-	else {
-		motor[liftMotor] = 0;
-	}
+	motor[liftMotor] = power;
 }
 
 //////////////////////
@@ -234,14 +133,81 @@ task Drive()
 {
 	while(true)
 	{
-	DriveLeftSide();
-		DriveRightSide();
-		DriveSpinnerMotor();
-		DriveFlagMotor();
-		DriveWinchMotors();
-		DriveHookServos();
-		DriveHopperServos();
-		DriveLiftMotor();
+		//Integer variable that allows you to specify a "deadzone" where values (both positive or negative)
+		//less than the threshold will be ignored.
+		int threshold = 10;
+		//Get the Latest joystick values
+		getJoystickSettings(joystick);
+
+		//Each of these passes a value to set the motors to under certain circumstances
+		//Left Wheels
+		if(abs(joystick.joy1_y1) > threshold){
+			DriveLeftSide(joystick.joy1_y1);
+		}
+		else {
+			DriveLeftSide(0);
+		}
+		//Right Wheels
+		if(abs(joystick.joy1_y2) > threshold) {
+			DriveRightSide(joystick.joy1_y2);
+		}
+		else {
+			DriveRightSide(0);
+		}
+		//Spinner
+		if(abs(joystick.joy2_y1) > threshold) {
+			DriveSpinnerMotor(joystick.joy2_y1);
+		}
+		else {
+			DriveSpinnerMotor(0);
+		}
+		//Flag
+		if(joystick.joy2_y2 > threshold) {
+			DriveFlagMotor(joystick.joy2_y2);
+		}
+		else {
+			DriveFlagMotor(0);
+		}
+		//Winches
+		if(joy2Btn(6) == 1) {
+			DriveWinchMotors(TEST_IMPULSE);
+		}
+		else if(joy2Btn(8) == 1) {
+			DriveWinchMotors(-TEST_IMPULSE);
+		}
+		else {
+			DriveWinchMotors(0);
+		}
+		//Hooks
+		if(joy2Btn(5) == 1) {
+			DriveHookServos(TEST_IMPULSE);
+		}
+		else if(joy2Btn(7) == 1) {
+			DriveHookServos(-TEST_IMPULSE);
+		}
+		else {
+			DriveHookServos(0);
+		}
+		//Hoppers
+		if(joy2Btn(1) == 1) {
+			DriveHopperServos(TEST_IMPULSE);
+		}
+		else if(joy2Btn(2) == 1) {
+			DriveHopperServos(-TEST_IMPULSE);
+		}
+		else {
+			DriveHopperServos(0);
+		}
+		//Lift
+		if(joy2Btn(4) == 1) {
+			DriveLiftMotor(TEST_IMPULSE);
+		}
+		else if(joy2Btn(3) == 1) {
+			DriveLiftMotor(-TEST_IMPULSE);
+		}
+		else {
+			DriveLiftMotor(0);
+		}
 	}
 }
 
@@ -253,8 +219,9 @@ task main()
   StartTask(Drive);
 
   int threshold = 10;
-	//Loop Forever
+	/* Not really sure what this loop is here for, going to leave it in just in case
 	while(true)
 	{
 	}
+	*/
 }
