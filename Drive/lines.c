@@ -69,6 +69,13 @@ void alignLine(FloorColor color, int speed, FloorColor stop = UNKNOWN, bool reve
 
 	// Start our turn to get the front sensor on the line
 	while(!onColor(color, LSvalRaw(lineLeft))) {
+		
+		// Stop alignment efforts if we hit the specified stop floor color
+		if (stop != UNKNOWN && (onColor(stop, LSvalRaw(lineRight)) || onColor(stop, LSvalRaw(lineLeft)))) {
+			break;
+		}
+		
+		// Turn in place
 		runDriveMotors(speed, -1 * speed);
 	}
 	stopDriveMotors();
@@ -80,18 +87,16 @@ void alignLine(FloorColor color, int speed, FloorColor stop = UNKNOWN, bool reve
 		if (stop != UNKNOWN && (onColor(stop, LSvalRaw(lineRight)) || onColor(stop, LSvalRaw(lineLeft)))) {
 			break;
 		}
-
-		// Drive forward and slightly left until the front sensor is clear of the line
-		while(!onColor(GREY, LSvalRaw(lineLeft))) { // NEED TO DETECT COMPLETELY OFF WHITE
+		
+		// Drive forward until the front sensor is clear of the line
+		// TODO: Adjust onColor to provide more useful results, so we can invert this test
+		if (!onColor(GREY, LSvalRaw(lineLeft))) {
 			runDriveMotors(speed, speed);
-		}
-		stopDriveMotors();
 
 		// Turn while neither sensor is on the line
-		while(!onColor(color, LSvalRaw(lineRight)) && !onColor(color, LSvalRaw(lineLeft))) {
+		} else if (!onColor(color, LSvalRaw(lineRight)) && !onColor(color, LSvalRaw(lineLeft))) {
 				runDriveMotors(speed, 0);
 		}
-		stopDriveMotors();
 	}
 
 	// Always stop when we're done
