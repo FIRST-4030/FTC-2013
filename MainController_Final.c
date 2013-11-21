@@ -37,14 +37,13 @@ Main Robot Code
 #include "drivers/hitechnic-sensormux.h"
 #include "drivers/lego-light.h"
 #include "JoystickDriver.c"
+#include "Motors/servos.c"
 
-///// CONSTANTS /////
-#define FULL_IMPULSE (100)
-#define HALF_IMPULSE (50)
-#define QUARTER_IMPULSE (25)
-#define EIGHTH_IMPULSE (12)
-const int TEST_IMPULSE = 50;
-const int SERVO_ADJUST = 1;
+// Motor Speeds //
+#define WHEEL_MAX (60)
+#define LIFT_SPEED (75)
+#define WINCH_SPEED (100)
+
 int leftHookVal = 0;
 int rightHookVal = 0;
 int leftHopperVal = 0;
@@ -58,50 +57,26 @@ const tMUXSensor lightLeft = msensor_S2_4;
 
 ////////////////////////////////
 ///// ROBOT INITIALIZATION /////
-void initializeRobot()
-{
+#include "MainIncludes.c";
+////////////////////////////////
 
-	// Initialize Motor Encoders //
-	nMotorEncoder[leftRearMotor] = 0;
-
-	// Stop All Motors //
-	motor[leftFrontMotor] = 0;
-	motor[leftRearMotor] = 0;
-	motor[rightFrontMotor] = 0;
-	motor[rightRearMotor] = 0;
-	motor[spinnerMotor] = 0;
-	motor[liftMotor] = 0;
-
-	// Hold All Servos Steady //
-	leftHookVal = servo[leftHook];
-	rightHookVal = servo[rightHook];
-	leftHopperVal = servo[leftHopper];
-	rightHopperVal = servo[rightHopper];
-
-	// Cycle Light Sensor Lights //
-	// Indicates Initialization Complete //
-	int delay = 50;
-	for(int i=0; i<10; i++)
-	{
-		LSsetInactive(lightRight);
-  	LSsetInactive(lightLeft);
-		wait1Msec(delay);
-	  LSsetActive(lightRight);
-  	LSsetActive(lightLeft);
-		wait1Msec(delay);
-	}
-
-	return;
-}
 
 void DriveLeftSide(int power)
 {
-	motor[leftFrontMotor] = power;
+	power = (float)power * 100.0/128.0;
+	if (power > WHEEL_MAX) {
+		power = WHEEL_MAX;
+	}
+  motor[leftFrontMotor] = power;
 	motor[leftRearMotor] = power;
 }
 
 void DriveRightSide(int power)
 {
+	power = (float)power * 100.0/128.0;
+	if (power > WHEEL_MAX) {
+		power = WHEEL_MAX;
+	}
 	motor[rightFrontMotor] = power;
 	motor[rightRearMotor] = power;
 }
@@ -139,6 +114,7 @@ void DriveLiftMotor(int power)
 	motor[liftMotor] = power;
 }
 
+
 //////////////////////
 ///// DRIVE TASK /////
 task Drive()
@@ -154,16 +130,20 @@ task Drive()
 		//Each of these passes a value to set the motors to under certain circumstances
 		//Left Wheels
 		if(abs(joystick.joy1_y1) > threshold){
-			DriveLeftSide(joystick.joy1_y1);
-		}
-		else {
+			int power = joystick.joy1_y1;
+			if(joy1Btn(7) == 1)
+				power *= 0.25;
+			DriveLeftSide(power);
+		} else {
 			DriveLeftSide(0);
 		}
 		//Right Wheels
 		if(abs(joystick.joy1_y2) > threshold) {
+			int power = joystick.joy1_y1;
+			if(joy1Btn(7) == 1)
+				power *= 0.25;
 			DriveRightSide(joystick.joy1_y2);
-		}
-		else {
+		}	else {
 			DriveRightSide(0);
 		}
 	}
@@ -176,6 +156,7 @@ task main()
 
   StartTask(Drive);
 
+  int hookPos = HOOK_MIN;
   int threshold = 10;
 	//Not really sure what this loop is here for, going to leave it in just in case
 	while(true)
@@ -198,48 +179,44 @@ task main()
 
 		//Winches
 		if(joy2Btn(6) == 1) {
-			DriveWinchMotors(TEST_IMPULSE);
+			DriveWinchMotors(WINCH_SPEED);
 		}
 		else if(joy2Btn(8) == 1) {
-			DriveWinchMotors(-TEST_IMPULSE);
+			DriveWinchMotors(-WINCH_SPEED);
 		}
 		else {
 			DriveWinchMotors(0);
 		}
-		/* Do not mess with
+
 		//Hooks
 		if(joy2Btn(5) == 1) {
-			DriveHookServos(leftHookVal-SERVO_ADJUST,rightHookVal+SERVO_ADJUST);
-			leftHookVal = leftHookVal - SERVO_ADJUST;
-			rightHookVal = rightHookVal + SERVO_ADJUST;
+			if (hookPos == HOOK_MIN) {
+				hookPos = HOOK_MID;
+			} else if (hookPos == HOOK_MID) {
+				hookPos = HOOK_MAX;
+			} else {
+				hookPos = HOOK_MIN;
+			}
+			SetHookServos(hookPos);
+			while(joy2Btn(5) == 1) {}
 		}
-		else if(joy2Btn(7) == 1) {
-			DriveHookServos(leftHookVal+SERVO_ADJUST,rightHookVal-SERVO_ADJUST);
-			leftHookVal = leftHookVal + SERVO_ADJUST;
-			rightHookVal = rightHookVal - SERVO_ADJUST;
+		if(joy2Btn(7) == 1) {
+			SetHookServos(HOOK_MAX);
 		}
-		else {
-		}
+
 		//Hoppers
 		if(joy2Btn(1) == 1) {
-			DriveHopperServos(leftHopperVal-SERVO_ADJUST,rightHopperVal+SERVO_ADJUST);
-			leftHopperVal = leftHopperVal - SERVO_ADJUST;
-			rightHopperVal = rightHopperVal + SERVO_ADJUST;
+			MoveHopperServos(HOPPER_INCR);
+		}	else if(joy2Btn(2) == 1) {
+			MoveHopperServos(-HOPPER_INCR);
 		}
-		else if(joy2Btn(2) == 1) {
-			DriveHopperServos(leftHopperVal+SERVO_ADJUST,rightHopperVal-SERVO_ADJUST);
-			leftHopperVal = leftHopperVal + SERVO_ADJUST;
-			rightHopperVal = rightHopperVal - SERVO_ADJUST;
-		}
-		else {
-		}
-		*/
+
 		//Lift
 		if(joy2Btn(4) == 1) {
-			DriveLiftMotor(TEST_IMPULSE);
+			DriveLiftMotor(LIFT_SPEED);
 		}
 		else if(joy2Btn(3) == 1) {
-			DriveLiftMotor(-TEST_IMPULSE);
+			DriveLiftMotor(-LIFT_SPEED);
 		}
 		else {
 			DriveLiftMotor(0);

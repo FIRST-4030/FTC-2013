@@ -50,51 +50,22 @@ int rightHookVal = 0;
 int leftHopperVal = 0;
 int rightHopperVal = 0;
 
-void MoveHookServo(int leftTarget, int rightTarget)
+void SetHookServo(int leftTarget, int rightTarget)
 {
 	servo[leftHook] = leftTarget;
 	servo[rightHook] = rightTarget;
 }
 
+void SetHopperServo(int leftTarget, int rightTarget)
+{
+	servo[leftHopper] = leftTarget;
+	servo[rightHopper] = rightTarget;
+}
+
 ////////////////////////////////
 ///// ROBOT INITIALIZATION /////
-void initializeRobot()
-{
+#include "MainIncludes.c";
 
-	// Initialize Motor Encoders //
-	nMotorEncoder[leftRearMotor] = 0;
-
-	// Stop All Motors //
-	motor[leftFrontMotor] = 0;
-	motor[leftRearMotor] = 0;
-	motor[rightFrontMotor] = 0;
-	motor[rightRearMotor] = 0;
-	motor[spinnerMotor] = 0;
-	motor[liftMotor] = 0;
-
-	MoveHookServo(200,200);
-	wait1Msec(100);
-	leftHookVal = servo[leftHook];
-	rightHookVal = servo[rightHook];
-//	leftHopperVal = servo[leftHopper];
-//	rightHopperVal = servo[rightHopper];
-
-
-	// Cycle Light Sensor Lights //
-	// Indicates Initialization Complete //
-	int delay = 50;
-	for(int i=0; i<10; i++)
-	{
-		LSsetInactive(lightRight);
-  	LSsetInactive(lightLeft);
-		wait1Msec(delay);
-	  LSsetActive(lightRight);
-  	LSsetActive(lightLeft);
-		wait1Msec(delay);
-	}
-
-	return;
-}
 
 //////////////////////
 ///// DRIVE TASK /////
@@ -142,15 +113,53 @@ task main()
 		rightHookVal = ServoValue[rightHook];
 		leftHopperVal = servo[leftHopper];
 		rightHopperVal = servo[rightHopper];
-		if(joy1Btn(2) == 1)
+		if(joy1Btn(2) == 1) // A
 		{
-			MoveHookServo(100,100);
+			SetHopperServo(100,100);
 		}
-		else if(joy1Btn(3) == 1)
+		else if(joy1Btn(3) == 1) // B
 		{
-			MoveHookServo(150,150);
+			SetHopperServo(200,200); // put away
+		}
+		else if(joy1Btn(6) == 1) // R1
+		{
+			int s = ServoValue[leftHopper]+10;
+			SetHopperServo(s,s);
+			while(joy1Btn(6)==1)
+			{}
+		}
+		else if(joy1Btn(5) ==1) // L1
+		{
+			int s = ServoValue[leftHopper]-10;
+			SetHopperServo(s,s);
+			while(joy1Btn(5)==1)
+			{}
 		}
 
+		if(joy1Btn(1) == 1) // X
+		{
+			SetHookServo(100,255-100);
+		}
+		else if(joy1Btn(4) == 1) // Y
+		{
+			SetHookServo(200,255-200); //
+		}
+		else if(joy1Btn(7) == 1) // R2
+		{
+			int sleft = ServoValue[leftHook]+10;
+			int sright = 255-sleft;
+			SetHookServo(sleft,sright);
+			while(joy1Btn(7)==1)
+			{}
+		}
+		else if(joy1Btn(8) ==1) // L2
+		{
+			int sleft = ServoValue[leftHook]-10;
+			int sright = 255-sleft;
+			SetHookServo(sleft,sright);
+			while(joy1Btn(8)==1)
+			{}
+		}
 
 		if(joy1Btn(10) == 1)
 			initializeRobot();
