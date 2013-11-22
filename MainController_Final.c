@@ -44,11 +44,6 @@ Main Robot Code
 #define LIFT_SPEED (75)
 #define WINCH_SPEED (100)
 
-int leftHookVal = 0;
-int rightHookVal = 0;
-int leftHopperVal = 0;
-int rightHopperVal = 0;
-
 ///// Sensor Multiplexer Interface /////
 const tMUXSensor sonar = msensor_S2_1;
 const tMUXSensor IRSeeker = msensor_S2_2;

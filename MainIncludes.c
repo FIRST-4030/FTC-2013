@@ -1,3 +1,5 @@
+
+
 void initializeRobot()
 {
 	wait1Msec(1000);
@@ -24,10 +26,6 @@ void initializeRobot()
 	servoChangeRate[rightHook] = 1;
 	servoChangeRate[leftHopper] = 1;
 	servoChangeRate[rightHopper] = 1;
-	leftHookVal = servo[leftHook];
-	rightHookVal = servo[rightHook];
-	leftHopperVal = servo[leftHopper];
-	rightHopperVal = servo[rightHopper];
 
 
 	// Cycle Light Sensor Lights //
