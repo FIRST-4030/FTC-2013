@@ -3,8 +3,7 @@
 #define HOOK_MIN (0) // Put Away //
 #define HOOK_MID (150)
 #define HOOK_MAX (255) // Put Out //
-const int HOOK_INCR = 5;
-const int HOPPER_INCR = 5;
+#define HOPPER_INCR (5)
 
 void SetHookServos(int loc)
 {
