@@ -65,7 +65,6 @@ const tMUXSensor lightLeft = msensor_S2_4;
 #define WALL_TO_MID (3000)
 
 int motorEncoder_out = 0;
-int motorEncoder_inches = 0;
 int B2I(int x)
 {
 	return x / BLIPS_PER_INCH;
@@ -197,57 +196,70 @@ void dump() {
 void OnFlagLineRightCorner_Basket()  //Add a bool variable that can be passed and call Wait?
 {
 
-	if(HTIRS2readACDir(IRSeeker) != 0) {
-		// Count distance from our starting point
-		resetDriveEncoder();
+	// Count distance from our starting point
+	resetDriveEncoder();
 
-		// Start timing our drive
-		ClearTimer(T2);
-		int startTurn = 2; // IRSeeker indicates far left
-		while(HTIRS2readACDir(IRSeeker) > startTurn) {
-			driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
-			/*
-			if (time100[T2] < MAX_AUTO_DRIVE_TIME) {
-				break;
-			}
-			*/
-		}
+	// IR failed -- static drive (i.e. hope)
+	if(HTIRS2readACDir(IRSeeker) == 0) {
+
+		// Forward left for 0.5 seconds
+		runDriveMotors(HALF_IMPULSE, FULL_IMPULSE);
+		wait1Msec(500);
 		stopDriveMotors();
 
-		int encoderAtTurn = readDriveEncoder();
-		motorEncoder_out = readDriveEncoder();
-		int stopTurn = 5;
+		// Forward for 0.5 seconds
+		runDriveMotors(FULL_IMPULSE, FULL_IMPULSE);
+		wait1Msec(500);
+		stopDriveMotors();
 
-		// Start timing our turn
-		ClearTimer(T2);
-		if (readDriveEncoder() < WALL_TO_MID) {
-			//Take Inside Left Turn //
-			while (HTIRS2readACDir(IRSeeker) != stopTurn) {
-				OutsideLeftTurn(false);
-				/*
-				if (time100[T2] < MAX_AUTO_TURN_TIME) {
-					break;
-					}
-				*/
-			}
-		} else {
-			//Take Outside Left Turn //
-			while (HTIRS2readACDir(IRSeeker) != stopTurn) {
-				InsideLeftTurn(false);
-			}
-			/*
+		// Nothing more to do but hope
+		return;
+	}
+
+	// Start timing our drive
+	ClearTimer(T2);
+
+	int startTurn = 2; // IRSeeker indicates far left
+	while(HTIRS2readACDir(IRSeeker) > startTurn) {
+		driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
+		/* Stop driving if it takes too long
+		if (time100[T2] < MAX_AUTO_DRIVE_TIME) {
+			break;
+		}
+		*/
+	}
+	stopDriveMotors();
+
+	motorEncoder_out = readDriveEncoder();
+	int stopTurn = 5;
+
+	// Start timing our turn
+	ClearTimer(T2);
+
+	if (readDriveEncoder() < WALL_TO_MID) {
+		//Take Inside Left Turn //
+		while (HTIRS2readACDir(IRSeeker) != stopTurn) {
+			OutsideLeftTurn(false);
+			/* Stop turning if it takes too long
 			if (time100[T2] < MAX_AUTO_TURN_TIME) {
 				break;
 				}
 			*/
 		}
-		stopDriveMotors();
-
-		///// PLACEHOLDER FOR DUMPING ROUTINE /////
-		dump();
-		///////////////////////////////////////////
+	} else {
+		//Take Outside Left Turn //
+		while (HTIRS2readACDir(IRSeeker) != stopTurn) {
+			InsideLeftTurn(false);
+		}
+		/* Stop turning if it takes too long
+		if (time100[T2] < MAX_AUTO_TURN_TIME) {
+			break;
+			}
+		*/
 	}
+	stopDriveMotors();
 }
+
 // Start Same as OnFlagLineRightCorner_Basket //
 // Turns, finds line, follows line up on ramp and stops //
 void OnFlagLineRightCorner_Ramp(bool reverse = false) {
@@ -326,9 +338,11 @@ task main() {
 	// Start counting time from autonomous start in timer T1
 	ClearTimer(T1);
 
-	// Optionally wait for our partner
+	// Wait for our partner
 	wait1Msec(6 * 1000);
 
-	// Drive to basket and dump
+	// Drive to basket
 	OnFlagLineRightCorner_Basket();
+	// Dump
+	dump();
 }
