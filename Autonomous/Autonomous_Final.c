@@ -117,16 +117,16 @@ void AutonomousInit() {
 void InsideLeftTurn(bool reverse)
 {
 	if(reverse == false)
-		driveMotors(-FULL_IMPULSE,0.35*FULL_IMPULSE,-1);
+		driveMotors(-FULL_IMPULSE,0,-1);
 	else
 		driveMotors(FULL_IMPULSE,0,-1);
 }
 void OutsideLeftTurn(bool reverse)
 {
 	if(reverse == false)
-		driveMotors(-QUARTER_IMPULSE,HALF_IMPULSE,-1);
+		driveMotors(FULL_IMPULSE,0,-1);
 	else
-		driveMotors(HALF_IMPULSE,-HALF_IMPULSE,-1);
+		driveMotors(-FULL_IMPULSE,0,-1);
 }
 
 void FollowLine(int lineColor)
@@ -167,57 +167,80 @@ task Drive() {
 //                                         AUTONOMOUS
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
+void dump() {
+	// Lift hopper
+	DriveLiftMotor(-FULL_IMPULSE);
+	wait1MSec(5000);
+	DriveLiftMotor(0);
+
+	// Drive forward to set distance
+	while(USredDist(sonar) > 41) {
+		runDriveMotors(QUARTER_IMPULSE, QUARTER_IMPULSE);
+	}
+	stopDriveMotors();
+	
+	// Unload
+	SetHopperServos(HOPPER_MIN);
+	DriveSpinnerMotor(HALF_IMPULSE);
+	wait1Msec(500);
+	DriveSpinnerMotor(0);
+}
+
+
 // Start the robot with the back right wheel touching the wall and the right wheels lined up with the flag line.
 // Face the robot along the flag line.
 void OnFlagLineRightCorner_Basket()  //Add a bool variable that can be passed and call Wait?
 {
-	//Would initiate Wait, could set whether or not to wait at beginning
-	/*
-	if(bool wait = true)
-	{
-		Wait();
-	}*/
-	if(HTIRS2readACDir(IRSeeker) != 0)
-	{
+	
+	if(HTIRS2readACDir(IRSeeker) != 0) {
+		// Count distance from our starting point
 		resetDriveEncoder();
-		int startTurn = 2; // IRSeeker indicates far left
-		while(HTIRS2readACDir(IRSeeker) > startTurn )
-			driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
 
+		// Start timing our drive
+		ClearTimer(T2);
+		int startTurn = 2; // IRSeeker indicates far left
+		while(HTIRS2readACDir(IRSeeker) > startTurn) {
+			driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
+			/*
+			if (time100[T2] < MAX_AUTO_DRIVE_TIME) {
+				break;
+			}
+			*/
+		}
 		stopDriveMotors();
+
 		int encoderAtTurn = readDriveEncoder();
 		motorEncoder_out = readDriveEncoder();
 		int stopTurn = 5;
-		if(readDriveEncoder() < WALL_TO_MID)
-		{
+
+		// Start timing our turn
+		ClearTimer(T2);
+		if (readDriveEncoder() < WALL_TO_MID) {
 			//Take Inside Left Turn //
-			while(HTIRS2readACDir(IRSeeker) != stopTurn)
+			while (HTIRS2readACDir(IRSeeker) != stopTurn) {
 				OutsideLeftTurn(false);
-	  }
-		else
-		{
+				/*
+				if (time100[T2] < MAX_AUTO_TURN_TIME) {
+					break;
+					}
+				*/
+			}
+		} else {
 			//Take Outside Left Turn //
-			while(HTIRS2readACDir(IRSeeker) != stopTurn)
+			while (HTIRS2readACDir(IRSeeker) != stopTurn) {
 				InsideLeftTurn(false);
+			}
+			/*
+			if (time100[T2] < MAX_AUTO_TURN_TIME) {
+				break;
+				}
+			*/
 		}
+		stopDriveMotors();
 
 		///// PLACEHOLDER FOR DUMPING ROUTINE /////
-		driveMotors(0,0,-1);
-		FlashLights(5,50);
+		dump();
 		///////////////////////////////////////////
-
-		// Return to Starting Point //
-		while(HTIRS2readACDir(IRSeeker) != startTurn)
-		{
-			if(encoderAtTurn < 3000)
-				OutsideLeftTurn(true);
-			else
-				InsideLeftTurn(true);
-		}
-		while(readDriveEncoder() > 0)
-			driveMotors(-HALF_IMPULSE,-HALF_IMPULSE,-1);
-
-		driveMotors(0,0,-1);
 	}
 }
 // Start Same as OnFlagLineRightCorner_Basket //
@@ -289,57 +312,18 @@ void CalibrateColors()
 	FlashLights(3,250);
 }
 
-task main()
-{
-  AutonomousInit();
-  //waitForStart(); // Wait for the beginning of autonomous phase.
+task main() {
+	AutonomousInit();
 
-  StartTask(Drive); // Allows control of robot between scenarios //
+	// Wait for the beginning of autonomous phase.
+	//waitForStart();
 
-  while(true)
-	{
-		getJoystickSettings(joystick);
-		IR_out = HTIRS2readACDir(IRSeeker);
-		Sonar_out = USreadDist(sonar);
-		LightRight_out = LSvalRaw(lightRight);
-		LightLeft_out = LSvalRaw(lightLeft);
-		motorEncoder_out = readDriveEncoder();
-		motorEncoder_inches = B2I(motorEncoder_out);
-
-		// Basket Routine Only //
-		if(joystick.joy1_TopHat == 0) // top-hat UP
-		{
-			StopTask(Drive);
-			OnFlagLineRightCorner_Basket();
-			StartTask(Drive);
-			FlashLights(2,250);
-		}
-
-		// Ramp Routine Only //
-		if(joystick.joy1_TopHat == 4) // top-hat DOWN
-		{
-			StopTask(Drive);
-			OnFlagLineRightCorner_Ramp();
-			StartTask(Drive);
-			FlashLights(2,250);
-		}
-
-		// Run Full Autonomous Routine //
-		if(joystick.joy1_TopHat == 2) // top-hat RIGHT
-		{
-			StopTask(Drive);
-			OnFlagLineRightCorner_Ramp(true);
-			StartTask(Drive);
-			FlashLights(2,250);
-		}
-
-		if(joy1Btn(9) == 1) // Back button
-			resetDriveEncoder();
-
-		if(joy1Btn(11) == 1) // Left Joystick Button // Reinitialize Robot //
-		  AutonomousInit();
-
-		if(joy1Btn(12) == 1) // Right Joystick Button
-			CalibrateColors();
-	}
+	// Start counting time from autonomous start in timer T1
+	ClearTimer(T1);
+	
+	// Optionally wait for our partner
+	//wait1Msec(5 * 1000);
+	
+	// Drive to basket and dump
+	OnFlagLineRightCorner_Basket();
 }
