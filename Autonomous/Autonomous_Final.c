@@ -99,7 +99,7 @@ void AutonomousInit() {
 	servoChangeRate[leftHopper] = 0;
 	servoChangeRate[rightHopper] = 0;
 
-	SetHopperServos(50);
+	SetHopperServos(HOPPER_MIN);
 	// Initialize the sensor and motor configuration
 	setLightSensorHeight(5.0);
 	setDriveMotors(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor);
