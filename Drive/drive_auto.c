@@ -1,0 +1,43 @@
+// Drive functions which the Main Controller Does not need //
+#define BLIPS_PER_INCH (1440.0 / 12.6)
+#define INCH_PER_BLIPS (12.6 / 1440.0)
+#define FULL_IMPULSE (100)
+#define HALF_IMPULSE (50)
+#define QUARTER_IMPULSE (25)
+#define EIGHTH_IMPULSE (12)
+#define WALL_TO_MID (3000)
+
+int motorEncoder_out = 0;
+int B2I(int x)
+{
+	return x / BLIPS_PER_INCH;
+}
+int I2B(int x)
+{
+	return x * INCH_PER_BLIPS;
+}
+
+void InsideLeftTurn(bool reverse)
+{
+	if(reverse == false)
+		driveMotors(-FULL_IMPULSE,0,-1);
+	else
+		driveMotors(FULL_IMPULSE,0,-1);
+}
+void OutsideLeftTurn(bool reverse)
+{
+	if(reverse == false)
+		driveMotors(FULL_IMPULSE,0,-1);
+	else
+		driveMotors(-FULL_IMPULSE,0,-1);
+}
+
+void FollowLine(int lineColor)
+{
+	if(LSvalRaw(lightLeft) > lineColor)
+		driveMotors(0,QUARTER_IMPULSE,-1);
+	else if(LSvalRaw(lightRight) > lineColor)
+		driveMotors(QUARTER_IMPULSE,0,-1);
+	else
+		driveMotors(QUARTER_IMPULSE,QUARTER_IMPULSE,-1);
+}

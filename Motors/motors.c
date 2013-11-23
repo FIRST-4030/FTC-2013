@@ -1,4 +1,3 @@
-#define WHEEL_MAX (60)
 // Store the motor ports for use in drive functions
 tMotor driveLeftFront;
 tMotor driveLeftRear;
@@ -10,27 +9,6 @@ void setDriveMotors(tMotor leftF, tMotor leftR, tMotor rightF, tMotor rightR) {
 	driveRightFront = rightF;
 	driveRightRear = rightR;
 }
-
-void DriveLeftSide(int power)
-{
-	power = (float)power * 100.0/128.0;
-	if (power > WHEEL_MAX) {
-		power = WHEEL_MAX;
-	}
-  motor[leftFrontMotor] = power;
-	motor[leftRearMotor] = power;
-}
-
-void DriveRightSide(int power)
-{
-	power = (float)power * 100.0/128.0;
-	if (power > WHEEL_MAX) {
-		power = WHEEL_MAX;
-	}
-	motor[rightFrontMotor] = power;
-	motor[rightRearMotor] = power;
-}
-
 
 // Run motors at the specified speed indefinately
 void runDriveMotors(int left, int right) {

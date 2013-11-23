@@ -1,3 +1,8 @@
+// Motor Speeds //
+#define WHEEL_MAX (75)
+#define LIFT_SPEED (100)
+#define WINCH_SPEED (100)
+
 // Drive until we exceed the specified distance
 void driveToDistance(int distance, int speed) {
 	// Sanity check
@@ -28,6 +33,25 @@ void driveToColor(FloorColor color, int speed) {
 		runDriveMotors(speed, speed);
 	}
 	stopDriveMotors();
+}
+
+// Direct Drive Functions //
+void DriveLeftSide(int power) {
+	power = (float)power * 100.0/128.0;
+	if (power > WHEEL_MAX) {
+		power = WHEEL_MAX;
+	}
+  motor[leftFrontMotor] = power;
+	motor[leftRearMotor] = power;
+}
+
+void DriveRightSide(int power) {
+	power = (float)power * 100.0/128.0;
+	if (power > WHEEL_MAX) {
+		power = WHEEL_MAX;
+	}
+	motor[rightFrontMotor] = power;
+	motor[rightRearMotor] = power;
 }
 
 //Added code from MainController for controlling motors other than the wheels

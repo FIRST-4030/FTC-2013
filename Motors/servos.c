@@ -1,9 +1,13 @@
+// Hopper Defines //
 #define HOPPER_MIN (35) // Put Down To Load //
 #define HOPPER_MAX (180) // Put Away //
+#define HOPPER_INCR (5)
+
+// Hook Defines //
 #define HOOK_MIN (0) // Put Away //
 #define HOOK_MID (150)
 #define HOOK_MAX (255) // Put Out //
-#define HOPPER_INCR (5)
+#define HOOK_INCR (10)
 
 void SetHookServos(int loc)
 {
