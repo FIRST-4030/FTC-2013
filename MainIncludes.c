@@ -21,9 +21,8 @@ void initializeRobot()
 	bFloatDuringInactiveMotorPWM = true;
 
 	SetHookServos(HOOK_MIN); // Put all the way back //
-	SetHopperServos(HOPPER_MAX); // Completely put away //
-	servoChangeRate[leftHook] = 1;
-	servoChangeRate[rightHook] = 1;
+	//servoChangeRate[leftHook] = 1;
+	//servoChangeRate[rightHook] = 1;
 	servoChangeRate[leftHopper] = 1;
 	servoChangeRate[rightHopper] = 1;
 

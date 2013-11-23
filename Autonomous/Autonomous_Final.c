@@ -94,7 +94,10 @@ void FlashLights(int times, int delay)
 // Additional Inits For Autonomous Mode //
 void AutonomousInit() {
 	initializeRobot();
+
 	bFloatDuringInactiveMotorPWM = false;
+	servoChangeRate[leftHopper] = 0;
+	servoChangeRate[rightHopper] = 0;
 
 	SetHopperServos(50);
 	// Initialize the sensor and motor configuration
@@ -170,19 +173,19 @@ task Drive() {
 void dump() {
 	// Lift hopper
 	DriveLiftMotor(-FULL_IMPULSE);
-	wait1MSec(5000);
+	wait1Msec(5000);
 	DriveLiftMotor(0);
 
 	// Drive forward to set distance
-	while(USredDist(sonar) > 41) {
+	while(USreadDist(sonar) > 41) {
 		runDriveMotors(QUARTER_IMPULSE, QUARTER_IMPULSE);
 	}
 	stopDriveMotors();
-	
+
 	// Unload
 	SetHopperServos(HOPPER_MIN);
 	DriveSpinnerMotor(HALF_IMPULSE);
-	wait1Msec(500);
+	wait1Msec(2000);
 	DriveSpinnerMotor(0);
 }
 
@@ -191,7 +194,7 @@ void dump() {
 // Face the robot along the flag line.
 void OnFlagLineRightCorner_Basket()  //Add a bool variable that can be passed and call Wait?
 {
-	
+
 	if(HTIRS2readACDir(IRSeeker) != 0) {
 		// Count distance from our starting point
 		resetDriveEncoder();
@@ -316,14 +319,14 @@ task main() {
 	AutonomousInit();
 
 	// Wait for the beginning of autonomous phase.
-	//waitForStart();
+	waitForStart();
 
 	// Start counting time from autonomous start in timer T1
 	ClearTimer(T1);
-	
+
 	// Optionally wait for our partner
-	//wait1Msec(5 * 1000);
-	
+	wait1Msec(6 * 1000);
+
 	// Drive to basket and dump
 	OnFlagLineRightCorner_Basket();
 }
