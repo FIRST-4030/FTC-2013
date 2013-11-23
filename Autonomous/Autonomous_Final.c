@@ -99,7 +99,7 @@ void AutonomousInit() {
 	servoChangeRate[leftHopper] = 0;
 	servoChangeRate[rightHopper] = 0;
 
-	SetHopperServos(HOPPER_MIN);
+	SetHopperServos(HOPPER_MAX);
 	// Initialize the sensor and motor configuration
 	setLightSensorHeight(5.0);
 	setDriveMotors(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor);
@@ -171,7 +171,7 @@ task Drive() {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 void dump() {
-	// Lift hopper
+	// Lift
 	DriveLiftMotor(-FULL_IMPULSE);
 	wait1Msec(5000);
 	DriveLiftMotor(0);
@@ -182,8 +182,10 @@ void dump() {
 	}
 	stopDriveMotors();
 
-	// Unload
+	// Deploy hopper
 	SetHopperServos(HOPPER_MIN);
+
+	// Unload
 	DriveSpinnerMotor(HALF_IMPULSE);
 	wait1Msec(2000);
 	DriveSpinnerMotor(0);
