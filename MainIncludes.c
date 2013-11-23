@@ -18,7 +18,7 @@ void initializeRobot()
 	motor[rightWinch] = 0;
 
 	// Set Wheels to Coast //
-	bFloatDuringInactiveMotorPWM = true;
+	//bFloatDuringInactiveMotorPWM = true;
 
 	SetHookServos(HOOK_MIN); // Put all the way back //
 	//servoChangeRate[leftHook] = 1;

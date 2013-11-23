@@ -41,7 +41,7 @@ Main Robot Code
 
 // Motor Speeds //
 #define WHEEL_MAX (60)
-#define LIFT_SPEED (75)
+#define LIFT_SPEED (100)
 #define WINCH_SPEED (100)
 
 ///// Sensor Multiplexer Interface /////
