@@ -92,18 +92,6 @@ void DriveWinchMotors(int power)
 	motor[rightWinch] = power;
 }
 
-void DriveHookServos(int leftPower, int rightPower)
-{
-	servo[leftHook] = leftPower;
-	servo[rightHook] = rightPower;
-}
-
-void DriveHopperServos(int leftPower, int rightPower)
-{
-	servo[leftHopper] = leftPower;
-	servo[rightHopper] = rightPower;
-}
-
 void DriveLiftMotor(int power)
 {
 	motor[liftMotor] = power;
@@ -153,7 +141,6 @@ task main()
 
   int hookPos = HOOK_MIN;
   int threshold = 10;
-	//Not really sure what this loop is here for, going to leave it in just in case
 	while(true)
 	{
 		getJoystickSettings(joystick);

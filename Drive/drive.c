@@ -29,3 +29,25 @@ void driveToColor(FloorColor color, int speed) {
 	}
 	stopDriveMotors();
 }
+
+//Added code from MainController for controlling motors other than the wheels
+void DriveSpinnerMotor(int power)
+{
+	motor[spinnerMotor] = power;
+}
+
+void DriveFlagMotor(int power)
+{
+	motor[flagMotor] = power;
+}
+
+void DriveWinchMotors(int power)
+{
+	motor[leftWinch] = power;
+	motor[rightWinch] = power;
+}
+
+void DriveLiftMotor(int power)
+{
+	motor[liftMotor] = power;
+}
