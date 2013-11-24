@@ -1,7 +1,6 @@
 #ifndef FTC_DRIVE_AUTO
 #define FTC_DRIVE_AUTO
 
-
 // Drive functions which the Main Controller Does not need //
 #define BLIPS_PER_INCH (1440.0 / 12.6)
 #define INCH_PER_BLIPS (12.6 / 1440.0)

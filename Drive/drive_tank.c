@@ -1,7 +1,9 @@
+// NOTE - Only one FTC_DRIVETASK can be defined at a time. //
+// If you include more than one FTC_DRIVETASK file, the first one included will be used //
 #ifndef FTC_DRIVETASK
 #define FTC_DRIVETASK
 
-///// DRIVE TASK /////
+///// TANK DRIVE TASK /////
 // Standard Tank Drive
 // Left Motors: joystick.joy1_y1
 // Right Motors: joystick.joy1_y2

@@ -1,5 +1,5 @@
-#ifndef FTC_AUTOINCLUDES
-#define FTC_AUTOINCLUDES
+#ifndef FTC_AUTO_INCLUDES
+#define FTC_AUTO_INCLUDES
 // Sensor Includes //
 #include "../drivers/hitechnic-sensormux.h"
 #include "../drivers/hitechnic-irseeker-v2.h"
@@ -23,7 +23,7 @@ const tMUXSensor lightLeft = msensor_S2_4;
 #include "../Drive/drive_auto.c"
 #include "JoystickDriver.c"
 
-#include "AutoInit.c"
-#include "AutoFunctions.c"
+#include "auto_init.c"
+#include "auto_functions.c"
 
 #endif

@@ -1,6 +1,6 @@
-#ifndef FTC_AUTOINIT
-#define FTC_AUTOINIT
-#include "../InitRobot.c"; // initializeRobot() Routine //
+#ifndef FTC_AUTO_INIT
+#define FTC_AUTO_INIT
+#include "../init_robot.c"; // initializeRobot() Routine //
 
 void AutonomousInit() {
 	initializeRobot();

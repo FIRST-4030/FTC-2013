@@ -1,5 +1,5 @@
-#ifndef FTC_AUTOFUNCTIONS
-#define FTC_AUTOFUNCTIONS
+#ifndef FTC_AUTO_FUNCTIONS
+#define FTC_AUTO_FUNCTIONS
 
 // Autonomous Mode Operational Functions //
 // Put functions here which do specific actions on the robot. //

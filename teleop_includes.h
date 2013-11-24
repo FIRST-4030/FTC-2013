@@ -1,5 +1,5 @@
-#ifndef FTC_TELEOPINCLUDES
-#define FTC_TELEOPINCLUDES
+#ifndef FTC_TELEOP_INCLUDES
+#define FTC_TELEOP_INCLUDES
 
 // Sensor Includes //
 #include "drivers/hitechnic-sensormux.h"
@@ -10,16 +10,16 @@ const tMUXSensor IRSeeker = msensor_S2_2;
 const tMUXSensor lightRight = msensor_S2_3;
 const tMUXSensor lightLeft = msensor_S2_4;
 // Light Sensor Functions //
-#include "Sensors/lights.c"
+#include "sensors/lights.c"
 
 // Teleop Includes
 #include "JoystickDriver.c"
 #include "sensors/colors.c"
-#include "Motors/servos.c"
-#include "Motors/motors.c"
-#include "Drive/lines.c"
-#include "Drive/drive.c"
+#include "motors/servos.c"
+#include "motors/motors.c"
+#include "drive/lines.c"
+#include "drive/drive.c"
 
-#include "InitRobot.c";
+#include "init_robot.c";
 
 #endif

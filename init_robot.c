@@ -1,5 +1,5 @@
-#ifndef FTC_INITROBOT
-#define FTC_INITROBOT
+#ifndef FTC_INIT_ROBOT
+#define FTC_INIT_ROBOT
 
 ///// INITIALIZE ROBOT /////
 void initializeRobot()
