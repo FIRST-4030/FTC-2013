@@ -1,0 +1,19 @@
+Any of these windows can be automatically spawned by including the following pragma near the top of your code:
+#pragma debuggerWindows("joystickGame");
+You replace "joystickGame" with one of the following:
+
+Globals
+Locals
+taskStatus
+callStack
+nxtDevices
+Servos
+NXTHubs
+Datalog
+Events
+systemParameters
+debugStream
+nxtLCDScreen
+joystickSimple
+joystickGame
+Times
