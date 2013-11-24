@@ -1,4 +1,6 @@
-//////////////////
+#ifndef FTC_LIGHTS
+#define FTC_LIGHTS
+
 ///// LIGHTS /////
 // All light related functions go here.
 
@@ -15,3 +17,6 @@ void FlashLights(int times, int delay)
 		wait1Msec(delay);
 	}
 }
+
+
+#endif

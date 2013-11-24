@@ -1,3 +1,6 @@
+#ifndef FTC_MOTORS
+#define FTC_MOTORS
+
 // Store the motor ports for use in drive functions
 tMotor driveLeftFront;
 tMotor driveLeftRear;
@@ -40,3 +43,6 @@ void resetDriveEncoder() {
 int readDriveEncoder() {
 	return nMotorEncoder[driveRightRear];
 }
+
+
+#endif

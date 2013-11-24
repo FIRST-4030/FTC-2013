@@ -1,3 +1,5 @@
+#ifndef FTC_COLORS
+#define FTC_COLORS
 // Which colors can we detect
 typedef enum {
 	BLACK,
@@ -112,3 +114,5 @@ bool onBlue(int sensorVal) {
 bool onRed(int sensorVal) {
 	return onColor(RED, sensorVal);
 }
+
+#endif

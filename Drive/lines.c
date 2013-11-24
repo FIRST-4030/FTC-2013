@@ -1,3 +1,6 @@
+#ifndef FTC_LINES
+#define FTC_LINES
+
 #define LIGHT_SENSOR_PORT_TYPE tMUXSensor
 //#define LIGHT_SENSOR_PORT_TYPE tSensors
 
@@ -69,12 +72,12 @@ void alignLine(FloorColor color, int speed, FloorColor stop = UNKNOWN, bool reve
 
 	// Start our turn to get the front sensor on the line
 	while(!onColor(color, LSvalRaw(lineLeft))) {
-		
+
 		// Stop alignment efforts if we hit the specified stop floor color
 		if (stop != UNKNOWN && (onColor(stop, LSvalRaw(lineRight)) || onColor(stop, LSvalRaw(lineLeft)))) {
 			break;
 		}
-		
+
 		// Turn in place
 		runDriveMotors(speed, -1 * speed);
 	}
@@ -87,7 +90,7 @@ void alignLine(FloorColor color, int speed, FloorColor stop = UNKNOWN, bool reve
 		if (stop != UNKNOWN && (onColor(stop, LSvalRaw(lineRight)) || onColor(stop, LSvalRaw(lineLeft)))) {
 			break;
 		}
-		
+
 		// Drive forward until the front sensor is clear of the line
 		// TODO: Adjust onColor to provide more useful results, so we can invert this test
 		if (!onColor(GREY, LSvalRaw(lineLeft))) {
@@ -102,3 +105,6 @@ void alignLine(FloorColor color, int speed, FloorColor stop = UNKNOWN, bool reve
 	// Always stop when we're done
 	stopDriveMotors();
 }
+
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef FTC_AUTOFUNCTIONS
+#define FTC_AUTOFUNCTIONS
+
 // Autonomous Mode Operational Functions //
 // Put functions here which do specific actions on the robot. //
 
@@ -133,3 +136,5 @@ void FlagLine_GoToRamp(bool reverse = false) {
 	// Rear Light Sensor is Mounted about 2" in front of wheels //
 	driveMotors(FULL_IMPULSE, FULL_IMPULSE, 500);
 }
+
+#endif

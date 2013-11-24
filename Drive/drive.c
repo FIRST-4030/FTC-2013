@@ -1,3 +1,7 @@
+#ifndef FTC_DRIVE
+#define FTC_DRIVE
+
+
 // Motor Speeds //
 #define WHEEL_MAX (75)
 #define LIFT_SPEED (100)
@@ -75,3 +79,5 @@ void DriveLiftMotor(int power)
 {
 	motor[liftMotor] = power;
 }
+
+#endif

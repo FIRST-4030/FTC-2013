@@ -31,11 +31,6 @@
 #pragma debuggerWindows("joystickSimple");
 #include "AutoIncludes.h"
 
-#include "../InitRobot.c"; // initializeRobot() Routine //
-#include "AutoInit.c"; // AutonomousInit() Routing //
-#include "AutoFunctions.c"; //
-
-///// MAIN TASK /////
 task main() {
 	AutonomousInit();
 

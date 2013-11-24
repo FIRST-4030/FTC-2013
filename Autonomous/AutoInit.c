@@ -1,3 +1,7 @@
+#ifndef FTC_AUTOINIT
+#define FTC_AUTOINIT
+#include "../InitRobot.c"; // initializeRobot() Routine //
+
 void AutonomousInit() {
 	initializeRobot();
 
@@ -30,3 +34,4 @@ void AutonomousInit() {
 	FlashLights(5,50);
 	return;
 }
+#endif

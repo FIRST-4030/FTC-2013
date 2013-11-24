@@ -1,4 +1,6 @@
-//////////////////////
+#ifndef FTC_DRIVETASK
+#define FTC_DRIVETASK
+
 ///// DRIVE TASK /////
 // Standard Tank Drive
 // Left Motors: joystick.joy1_y1
@@ -36,3 +38,5 @@ task Drive()
 		}
 	}
 }
+
+#endif

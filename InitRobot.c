@@ -1,4 +1,6 @@
-////////////////////////////
+#ifndef FTC_INITROBOT
+#define FTC_INITROBOT
+
 ///// INITIALIZE ROBOT /////
 void initializeRobot()
 {
@@ -28,3 +30,6 @@ void initializeRobot()
 
 	return;
 }
+
+
+#endif

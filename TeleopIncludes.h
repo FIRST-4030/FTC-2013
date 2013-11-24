@@ -1,3 +1,6 @@
+#ifndef FTC_TELEOPINCLUDES
+#define FTC_TELEOPINCLUDES
+
 // Sensor Includes //
 #include "drivers/hitechnic-sensormux.h"
 #include "drivers/lego-light.h"
@@ -16,3 +19,7 @@ const tMUXSensor lightLeft = msensor_S2_4;
 #include "Motors/motors.c"
 #include "Drive/lines.c"
 #include "Drive/drive.c"
+
+#include "InitRobot.c";
+
+#endif
