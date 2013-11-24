@@ -81,7 +81,7 @@ int I2B(int x)
 
 ////////////////////////////////
 ///// ROBOT INITIALIZATION /////
-#include "../MainIncludes.c";
+#include "../InitRobot.c";
 // Additional Inits For Autonomous Mode //
 void AutonomousInit() {
 	initializeRobot();

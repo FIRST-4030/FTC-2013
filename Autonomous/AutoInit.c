@@ -2,6 +2,14 @@ void AutonomousInit() {
 	initializeRobot();
 
 	bFloatDuringInactiveMotorPWM = false;
+
+	// Init Global Variables //
+	if(HTIRS2readACDir(IRSeeker) > 5){
+		STARTED_ON_LEFT = false;
+	}
+
+
+	// Maximize Hopper Change Rates //
 	servoChangeRate[leftHopper] = 0;
 	servoChangeRate[rightHopper] = 0;
 
@@ -14,7 +22,7 @@ void AutonomousInit() {
 	// Initialize Motor Encoders //
 	resetDriveEncoder();
 
-	// Stop All Motors //
+	// Stop All Drive Motors //
 	stopDriveMotors();
 
 	// Cycle Light Sensor Lights //

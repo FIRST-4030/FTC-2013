@@ -26,10 +26,5 @@ void initializeRobot()
 	servoChangeRate[leftHopper] = 1;
 	servoChangeRate[rightHopper] = 1;
 
-
-	// Cycle Light Sensor Lights //
-	// Indicates Initialization Complete //
-	FlashLights(5,50);
-
 	return;
 }

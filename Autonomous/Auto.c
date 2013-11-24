@@ -42,14 +42,14 @@ task main() {
 	// Wait for the beginning of autonomous phase.
 	waitForStart();
 
-	// Start counting time from autonomous start in timer T1
-	ClearTimer(T1);
+	// Basket Routine //
+	FlagLine_DriveToBasket();
+	PrepareToDump();
+	int SonarBeforeBasketApproach = USreadDist(sonar);
+	ApproachBasket();
+	DumpHopper();
+	FlagLine_ReturnFromBasket(SonarBeforeBasketApproach);
 
-	// Wait for our partner
-	wait1Msec(6 * 1000);
-
-	// Drive to basket
-	OnFlagLineRightCorner_Basket();
-	// Dump
-	dump();
+	// Ramp Routine //
+	FlagLine_GoToRamp();
 }

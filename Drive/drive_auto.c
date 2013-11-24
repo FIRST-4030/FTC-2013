@@ -7,6 +7,7 @@
 #define EIGHTH_IMPULSE (12)
 #define WALL_TO_MID (3000)
 
+bool STARTED_ON_LEFT = true;
 int motorEncoder_out = 0;
 int B2I(int x)
 {
@@ -17,19 +18,33 @@ int I2B(int x)
 	return x * INCH_PER_BLIPS;
 }
 
-void InsideLeftTurn(bool reverse)
+void InsideTurn(bool reverse)
 {
-	if(reverse == false)
-		driveMotors(-FULL_IMPULSE,0,-1);
-	else
-		driveMotors(FULL_IMPULSE,0,-1);
+	if(STARTED_ON_LEFT){
+		if(reverse == false)
+			driveMotors(-FULL_IMPULSE,0,-1);
+		else
+			driveMotors(FULL_IMPULSE,0,-1);
+	} else {
+		if(reverse == false)
+			driveMotors(0,-FULL_IMPULSE,-1);
+		else
+			driveMotors(0,FULL_IMPULSE,-1);
+	}
 }
-void OutsideLeftTurn(bool reverse)
+void OutsideTurn(bool reverse)
 {
-	if(reverse == false)
-		driveMotors(FULL_IMPULSE,0,-1);
-	else
-		driveMotors(-FULL_IMPULSE,0,-1);
+	if(STARTED_ON_LEFT){
+		if(reverse == false)
+			driveMotors(0,FULL_IMPULSE,-1);
+		else
+			driveMotors(0,-FULL_IMPULSE,-1);
+	} else {
+		if(reverse == false)
+			driveMotors(FULL_IMPULSE,0,-1);
+		else
+			driveMotors(-FULL_IMPULSE,0,-1);
+	}
 }
 
 void FollowLine(int lineColor)
