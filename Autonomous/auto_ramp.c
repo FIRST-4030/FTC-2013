@@ -39,5 +39,5 @@ task main() {
 	waitForStart();
 
 	// Ramp Routine //
-	FlagLine_GoToRamp();
+	Wall_DirectToRamp();
 }

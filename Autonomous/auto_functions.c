@@ -116,7 +116,7 @@ void FlagLine_ReturnFromBasket(int sonarTarget) {
 
 // Start Same as OnFlagLineRightCorner_Basket //
 // Turns, finds line, follows line up on ramp and stops //
-void FlagLine_GoToRamp(bool reverse = false) {
+void FlagLine_FollowLineToRamp(bool reverse = false) {
 	// Turn Left Dead Reckoning //
 	if (reverse) {
 		driveMotors(HALF_IMPULSE,-1 * HALF_IMPULSE, 900);
@@ -137,4 +137,11 @@ void FlagLine_GoToRamp(bool reverse = false) {
 	driveMotors(FULL_IMPULSE, FULL_IMPULSE, 500);
 }
 
+void Wall_DirectToRamp() {
+	resetDriveEncoder();
+
+	while(readDriveEncoder() < 10000) {
+		runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
+	}
+}
 #endif
