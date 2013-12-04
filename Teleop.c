@@ -44,7 +44,11 @@ task main()
 		getJoystickSettings(joystick);
 		//Spinner // Left Joystick //
 		if(abs(joystick.joy2_y1) > threshold) {
-			DriveSpinnerMotor(joystick.joy2_y1);
+			if(joystick.joy2_y1 < 0) {
+				DriveSpinnerMotor(joystick.joy2_y1);
+			} else {
+				DriveSpinnerMotor(30);
+			}
 	  } else {
 			DriveSpinnerMotor(0);
 		}
