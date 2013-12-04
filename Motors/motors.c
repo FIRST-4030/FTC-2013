@@ -30,7 +30,7 @@ void stopDriveMotors() {
 // Run motors at the specified speed, stopping after DURATION milliseconds
 void driveMotors(int left, int right, const int duration = 0) {
 	runDriveMotors(left, right);
-	if (duration >= 0) {
+	if (duration > 0) {
 		wait1Msec(duration);
 	}
 }

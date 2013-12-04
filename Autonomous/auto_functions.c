@@ -4,15 +4,25 @@
 // Autonomous Mode Operational Functions //
 // Put functions here which do specific actions on the robot. //
 
+void RaiseLift() {
+	DriveLiftMotor(-LIFT_SPEED);
+	wait1Msec(5000);
+	DriveLiftMotor(0);
+}
+
+void DumpHopperByLoweringIt(){
+	SetHopperServos(HOPPER_MIN);
+}
+
 void PrepareToDump() {
 	// Deploy hopper
 	// This operation is not instantaneous but the function does return instantly.
 	// It takes a couple seconds for the hopper to deploy. Calling this prior to
 	// DriveLiftMotor() will allow the hopper to deploy while the lift goes up.
-	SetHopperServos(HOPPER_MIN);
+	SetHopperServos(HOPPER_DUMP);
 
 	// Lift
-	DriveLiftMotor(-FULL_IMPULSE);
+	DriveLiftMotor(-LIFT_SPEED);
 	wait1Msec(5000);
 	DriveLiftMotor(0);
 }
@@ -26,8 +36,12 @@ void DumpHopper() {
 
 void ApproachBasket() {
 	// Drive forward to set distance
-	while(USreadDist(sonar) > 41) {
-		runDriveMotors(QUARTER_IMPULSE, QUARTER_IMPULSE);
+	while(USreadDist(sonar) > 41 ) {
+		//runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
+		if(HTIRS2readACDir(IRSeeker) < 5)
+			runDriveMotors(QUARTER_IMPULSE,HALF_IMPULSE); // slight left turn
+		else
+			runDriveMotors(HALF_IMPULSE,QUARTER_IMPULSE); // slight right turn
 	}
 	stopDriveMotors();
 }
@@ -57,17 +71,26 @@ void FlagLine_DriveToBasket()  //Add a bool variable that can be passed and call
 	int IRVal = HTIRS2readACDir(IRSeeker);
 
 	// IR failed -- static drive (i.e. hope)
-	if(IRVal == 0) {
-		IRFailed();
-		return;
-	}
+//	if(IRVal == 0) {
+//		IRFailed();
+//		return;
+//	}
 
 	// Drive Forward Until Aligned With Basket //
-	int startTurn = 2; // Assume start on the left
+	// @Zach - yes this is redundant code but it is easier to follow than setting a default and other //
 	if(STARTED_ON_LEFT == true)
-		startTurn = 8; // If we started on the right
-	while(HTIRS2readACDir(IRSeeker) > startTurn) {
-		driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
+	{
+		int startTurn = 2; // Starting on the Left
+		while(HTIRS2readACDir(IRSeeker) > startTurn) {
+			driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
+		}
+	}
+	else if(STARTED_ON_LEFT == false)
+	{
+		int startTurn = 8; // Starting on the Right
+		while(HTIRS2readACDir(IRSeeker) < startTurn) {
+			driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
+		}
 	}
 	stopDriveMotors();
 
@@ -76,11 +99,19 @@ void FlagLine_DriveToBasket()  //Add a bool variable that can be passed and call
 	int stopTurn = 5;
 	if (readDriveEncoder() < WALL_TO_MID) {
 		while (HTIRS2readACDir(IRSeeker) != stopTurn) {
-			OutsideTurn(false);
+			if(STARTED_ON_LEFT == true){
+				EarlyBasketTurnLeft(false);
+			} else {
+				EarlyBasketTurnRight(false);
+			}
 		}
 	} else {
 		while (HTIRS2readACDir(IRSeeker) != stopTurn) {
-			InsideTurn(false);
+			if(STARTED_ON_LEFT == true){
+				LateBasketTurnLeft(false);
+			} else {
+				LateBasketTurnRight(false);
+			}
 		}
 	}
 	stopDriveMotors();

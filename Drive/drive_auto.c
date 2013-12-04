@@ -21,6 +21,35 @@ int I2B(int x)
 	return x * INCH_PER_BLIPS;
 }
 
+void EarlyBasketTurnLeft(bool reverse)
+{
+	if(reverse == false)
+		driveMotors(-FULL_IMPULSE,FULL_IMPULSE,-1);
+	else
+		driveMotors(FULL_IMPULSE,-FULL_IMPULSE,-1);
+}
+void LateBasketTurnLeft(bool reverse)
+{
+	if(reverse == false)
+		driveMotors(-FULL_IMPULSE,FULL_IMPULSE,-1);
+	else
+		driveMotors(FULL_IMPULSE,-FULL_IMPULSE,-1);
+}
+void EarlyBasketTurnRight(bool reverse)
+{
+	if(reverse == false)
+		driveMotors(FULL_IMPULSE,-FULL_IMPULSE,-1);
+	else
+		driveMotors(-FULL_IMPULSE,FULL_IMPULSE,-1);
+}
+void LateBasketTurnRight(bool reverse)
+{
+	if(reverse == false)
+		driveMotors(FULL_IMPULSE,-FULL_IMPULSE,-1);
+	else
+		driveMotors(-FULL_IMPULSE,FULL_IMPULSE,-1);
+}
+
 void InsideTurn(bool reverse)
 {
 	if(STARTED_ON_LEFT){
