@@ -37,35 +37,31 @@
 ///// MAIN TASK /////
 task main() {
 	AutonomousInit();
-	StartTask(Drive);
-	StartTask(AutoTestControl);
-  if(HTIRS2readACDir(IRSeeker) > 5)
-		STARTED_ON_LEFT = false;
+
 	// Wait for the beginning of autonomous phase.
-	//waitForStart();
-	while(true)
-	{
-		IR_out = HTIRS2readACDir(IRSeeker);
-		Sonar_out = USreadDist(sonar);
-		getJoystickSettings(joystick);
-		if(joy1Btn(10) ==1)
-		{
-			StopTask(Drive);
-			StopTask(AutoTestControl);
-			// Basket Routine //
-			FlagLine_DriveToBasket();
-			if(STARTED_ON_LEFT == true)
-				driveMotors(QUARTER_IMPULSE,-QUARTER_IMPULSE,500);
-			else
-				driveMotors(QUARTER_IMPULSE,-QUARTER_IMPULSE,500);
-			driveMotors(0,0);
-			int SonarBeforeBasketApproach = USreadDist(sonar);
-			RaiseLift();
-//			ApproachBasket();
-			DumpHopperByLoweringIt();
-			//FlagLine_ReturnFromBasket(SonarBeforeBasketApproach);
-			StartTask(Drive);
-			StartTask(AutoTestControl);
-		}
+	waitForStart();
+
+	// Did we start on the left or right?
+	STARTED_ON_LEFT = true;
+	if (HTIRS2readACDir(IRSeeker) > 5) {
+		STARTED_ON_LEFT = false;
 	}
+
+	// Drive parallel to the baskets until we are at the beacon
+	FlagLine_DriveToBasket();
+
+	// Lift so sonar works
+	MoveLift(false);
+
+	// Drive up to the basket
+	ApproachBasket();
+
+	// Dump
+	DumpHopper();
+
+	// Lower so we can drive
+	MoveLift(true);
+
+	// Return to base
+	//FlagLine_ReturnFromBasket(SonarBeforeBasketApproach);
 }

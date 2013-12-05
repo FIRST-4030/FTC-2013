@@ -31,6 +31,34 @@ void driveToDistance(int distance, int speed) {
 	stopDriveMotors();
 }
 
+void turnInPlace(int distance, int speed, bool left = true) {
+	// Sanity check
+	if (distance == 0) {
+		return;
+	}
+
+	// Turn right if requested
+	if (!left) {
+		speed *= -1;
+	}
+
+	// Reset the encode and start driving
+	resetDriveEncoder();
+	runDriveMotors(-speed, speed);
+
+	// Loop until we hit a stop condition
+	while (true) {
+		if (distance > 0 && readDriveEncoder() > distance) {
+			break;
+		} else if (distance < 0 && readDriveEncoder() < distance) {
+			break;
+		}
+	}
+
+	// Always stop when we're done
+	stopDriveMotors();
+}
+
 // Drive until we hit the specified color
 void driveToColor(FloorColor color, int speed) {
 	while (!onColor(color, LSvalRaw(lineLeft)) && !onColor(color, LSvalRaw(lineRight))) {
@@ -62,6 +90,10 @@ void DriveRightSide(int power) {
 void DriveSpinnerMotor(int power)
 {
 	motor[spinnerMotor] = power;
+}
+
+void StopSpinnerMotor() {
+	motor[spinnerMotor] = 0;
 }
 
 void DriveFlagMotor(int power)

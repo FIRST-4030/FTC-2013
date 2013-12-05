@@ -4,10 +4,19 @@
 // Autonomous Mode Operational Functions //
 // Put functions here which do specific actions on the robot. //
 
-void RaiseLift() {
-	DriveLiftMotor(-LIFT_SPEED);
+void MoveLift(bool down = true) {
+	int speed = LIFT_SPEED;
+	if (!down) {
+		speed *= -1;
+	}
+
+	DriveLiftMotor(speed);
 	wait1Msec(5000);
 	DriveLiftMotor(0);
+}
+
+void RaiseLift() {
+	MoveLift(false);
 }
 
 void DumpHopperByLoweringIt(){
@@ -28,13 +37,35 @@ void PrepareToDump() {
 }
 
 void DumpHopper() {
-	// Unload
-	DriveSpinnerMotor(HALF_IMPULSE);
-	wait1Msec(1000);
-	DriveSpinnerMotor(0);
+	SetHopperServos(HOPPER_DUMP);
+	wait1Msec(500);
+	DriveSpinnerMotor(30);
+	wait1Msec(750);
+	DriveSpinnerMotor(50);
+	wait1Msec(500);
+	StopSpinnerMotor();
+	SetHopperServos(HOPPER_MAX);
+}
+
+void IRFailed() {
+	driveToDistance(1750, HALF_IMPULSE);
+	turnInPlace(3000, HALF_IMPULSE);
+}
+
+void SonarFailed() {
+	driveToDistance(1800, HALF_IMPULSE);
+	return;
 }
 
 void ApproachBasket() {
+	int range = USreadDist(sonar);
+
+	// Ensure sonar is sane
+	if (range < 10 || range > 100) {
+		SonarFailed();
+		return;
+	}
+
 	// Drive forward to set distance
 	while(USreadDist(sonar) > 41 ) {
 		//runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
@@ -44,21 +75,6 @@ void ApproachBasket() {
 			runDriveMotors(HALF_IMPULSE,QUARTER_IMPULSE); // slight right turn
 	}
 	stopDriveMotors();
-}
-
-void IRFailed() {
-		// Forward left for 0.5 seconds
-		runDriveMotors(HALF_IMPULSE, FULL_IMPULSE);
-		wait1Msec(500);
-		stopDriveMotors();
-
-		// Forward for 0.5 seconds
-		runDriveMotors(FULL_IMPULSE, FULL_IMPULSE);
-		wait1Msec(500);
-		stopDriveMotors();
-
-		// Nothing more to do but hope
-		return;
 }
 
 // Start the robot with the back right wheel touching the wall and the right wheels lined up with the flag line.
@@ -71,10 +87,10 @@ void FlagLine_DriveToBasket()  //Add a bool variable that can be passed and call
 	int IRVal = HTIRS2readACDir(IRSeeker);
 
 	// IR failed -- static drive (i.e. hope)
-//	if(IRVal == 0) {
-//		IRFailed();
-//		return;
-//	}
+	if(IRVal < 1 || IRVal > 8) {
+		IRFailed();
+		return;
+	}
 
 	// Drive Forward Until Aligned With Basket //
 	// @Zach - yes this is redundant code but it is easier to follow than setting a default and other //
@@ -82,17 +98,18 @@ void FlagLine_DriveToBasket()  //Add a bool variable that can be passed and call
 	{
 		int startTurn = 2; // Starting on the Left
 		while(HTIRS2readACDir(IRSeeker) > startTurn) {
-			driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
+			runDriveMotors(HALF_IMPULSE, HALF_IMPULSE);
 		}
 	}
 	else if(STARTED_ON_LEFT == false)
 	{
 		int startTurn = 8; // Starting on the Right
 		while(HTIRS2readACDir(IRSeeker) < startTurn) {
-			driveMotors(HALF_IMPULSE, HALF_IMPULSE, -1);
+			runDriveMotors(HALF_IMPULSE, HALF_IMPULSE);
 		}
 	}
 	stopDriveMotors();
+	return;
 
 	// Turn Until Facing IR Beacon //
 	motorEncoder_out = readDriveEncoder();
