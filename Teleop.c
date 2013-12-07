@@ -52,6 +52,7 @@ task main()
 	  } else {
 			DriveSpinnerMotor(0);
 		}
+
 		//Flag // Right Joystick //
 		if(joystick.joy2_y2 > threshold) {
 			DriveFlagMotor(joystick.joy2_y2);
@@ -64,15 +65,18 @@ task main()
 			DriveWinchMotors(WINCH_SPEED);
 		}
 		else if(joy2Btn(8) == 1) { // R2 //
-			DriveWinchMotors(-WINCH_SPEED);
+			// The winch is only allowed to drive forward
+			DriveWinchMotors(WINCH_SPEED);
 		}	else {
 			DriveWinchMotors(0);
 		}
 
 		//Hooks
 		if(joy2Btn(5) == 1) {         // L1 //
+			SetHopperServos(HOPPER_MAX);
 			MoveHookServos(HOOK_INCR);  // UP //
 		} else if(joy2Btn(7) == 1) {  // L2 //
+			SetHopperServos(HOPPER_MAX);
 			MoveHookServos(-HOOK_INCR); // DOWN //
 		}
 
