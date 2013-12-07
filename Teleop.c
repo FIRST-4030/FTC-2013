@@ -34,9 +34,9 @@
 task main()
 {
   initializeRobot();
+  waitForStart();
 
   StartTask(Drive);
-  FlashLights(2,50);
 
   int threshold = 10;
 	while(true)
