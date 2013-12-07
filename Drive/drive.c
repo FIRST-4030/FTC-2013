@@ -3,7 +3,7 @@
 
 
 // Motor Speeds //
-#define WHEEL_MAX (75)
+#define WHEEL_MAX (100)
 #define LIFT_SPEED (75)
 #define WINCH_SPEED (100)
 
@@ -29,6 +29,12 @@ void driveToDistance(int distance, int speed) {
 
 	// Always stop when we're done
 	stopDriveMotors();
+}
+
+// Drive to target encoder value
+void driveToTargetValue(int target, int speed)
+{
+	driveToDistance(target-readDriveEncoder(),speed);
 }
 
 void turnInPlace(int distance, int speed, bool left = true) {

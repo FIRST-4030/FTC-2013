@@ -29,7 +29,9 @@ task AutoTestControl()
 			DriveWinchMotors(WINCH_SPEED);
 		}
 		else if(joy1Btn(8) == 1) { // R2 //
-			DriveWinchMotors(-WINCH_SPEED);
+			DriveWinchMotors(WINCH_SPEED);
+		} else if(joy1Btn(10) == 1) { // START //
+			DriveWinchMotors(-0.5*WINCH_SPEED);
 		}	else {
 			DriveWinchMotors(0);
 		}

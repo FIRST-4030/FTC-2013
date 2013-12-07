@@ -31,6 +31,8 @@
 #include "teleop_includes.h"
 #include "drive/drive_tank.c"
 
+#define SPINNER_EJECT_SPEED (50)
+
 task main()
 {
   initializeRobot();
@@ -47,7 +49,7 @@ task main()
 			if(joystick.joy2_y1 < 0) {
 				DriveSpinnerMotor(joystick.joy2_y1);
 			} else {
-				DriveSpinnerMotor(30);
+				DriveSpinnerMotor(SPINNER_EJECT_SPEED);
 			}
 	  } else {
 			DriveSpinnerMotor(0);
@@ -67,7 +69,9 @@ task main()
 		else if(joy2Btn(8) == 1) { // R2 //
 			// The winch is only allowed to drive forward
 			DriveWinchMotors(WINCH_SPEED);
-		}	else {
+		}	else if(joy2Btn(10) == 1) { // START BUTTON //
+			DriveWinchMotors(-0.5*WINCH_SPEED);
+		} else {
 			DriveWinchMotors(0);
 		}
 
