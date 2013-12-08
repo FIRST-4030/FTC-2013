@@ -31,8 +31,10 @@
 #pragma debuggerWindows("joystickSimple");
 #include "auto_includes.h"
 #include "drive/drive_tank.c"
+
+// Basket Encoder Distances and IR Distances //
 #define B1 (3000)
-#define B1IR (3000)
+#define B1IR (3200)
 #define B2 (4400)
 #define B2IR (4700)
 #define B3 (7000)
@@ -57,23 +59,29 @@ task main() {
 			resetDriveEncoder();
 		if(joy1Btn(9) == 1)
 		{
+			// Test Drive and Control Tasks //
 			StopTask(Drive);
 			StopTask(AutoTestControl);
-			// Drive parallel to the baskets until we are at the beacon
+			
+			// IR Failover Check //
 			if(IR_out < 1 || IR_out > 9)
 			{
 				StartTask(Drive);
 				StartTask(AutoTestControl);
 				continue;
 			}
+			
+			// Drive parallel to the baskets until we are at the beacon
 			resetDriveEncoder();
-			while(HTIRS2readACDir(IRSeeker) != 8)
+			while(HTIRS2readACDir(IRSeeker) != 8) // would need to be a 2 if going form the left
 				runDriveMotors(FULL_IMPULSE,FULL_IMPULSE);
 			stopDriveMotors();
+
+			// Decide on correct basket based on encoder distance //
 			int enVal = readDriveEncoder();
-			if(enVal < B1IR)
+			if(enVal < (B1+B2)/2) // Decision point is between B1 and B2
 			{
-				if(enVal < ((B1IR+B2IR)/2))
+				if(enVal < B1)
 				{
 					while(readDriveEncoder() < B1)
 						runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
@@ -84,7 +92,7 @@ task main() {
 						runDriveMotors(-HALF_IMPULSE,-HALF_IMPULSE);
 				}
 			}
-			else if(enVal < ((B2IR+B3IR)/2))
+			else if(enVal < ((B2+B3)/2)) // Decision point is between B2 and B3
 			{
 				if(enVal < B2)
 				{
@@ -97,7 +105,7 @@ task main() {
 						runDriveMotors(-HALF_IMPULSE,-HALF_IMPULSE);
 				}
 			}
-			else if(enVal < ((B4IR+B3IR)/2))
+			else if(enVal < ((B4+B3)/2)) // Decision point is between B3 and B4
 			{
 				if(enVal < B3)
 				{
@@ -125,14 +133,24 @@ task main() {
 			}
 			stopDriveMotors();
 
+			// Raise Lift //
 			RaiseLift();
 			resetDriveEncoder();
+			
+			// @Zach: reverse turn function was not working
+			// Turn Right 90 Degrees //
 			while(readDriveEncoder() > -3000)
 				runDriveMotors(HALF_IMPULSE,-HALF_IMPULSE);
 			stopDriveMotors();
+			
+			// Drop Brick //
 			SetHopperServos(HOPPER_MIN);
 			wait1Msec(1000);
+			
+			// Put Away Hopper //
 			SetHopperServos(HOPPER_MAX);
+			
+			// Lower Lift //
 			MoveLift(true);
 
 			// Return to base
