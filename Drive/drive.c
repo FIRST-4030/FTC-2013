@@ -37,6 +37,26 @@ void driveToTargetValue(int target, int speed)
 	driveToDistance(target-readDriveEncoder(),speed);
 }
 
+void driveToNearestBasket(int speed)
+{
+	int enVal = readDriveEncoder();
+	// B1 = 3000		2500
+		// div = 3600
+	// B2 = 4400
+		// div = 5700
+	// B3 = 7000
+		// div 7700
+	// B4 = 8400
+	if(enVal < 3600)
+		driveToTargetValue(3000,speed);
+	else if(enVal < 5700)
+		driveToTargetValue(4400,speed);
+	else if(enVal < 7700)
+		driveToTargetValue(7000,speed);
+	else
+		driveToTargetValue(8400,speed);
+}
+
 void turnInPlace(int distance, int speed, bool left = true) {
 	// Sanity check
 	if (distance == 0) {

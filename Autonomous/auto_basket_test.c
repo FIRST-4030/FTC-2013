@@ -31,7 +31,14 @@
 #pragma debuggerWindows("joystickSimple");
 #include "auto_includes.h"
 #include "drive/drive_tank.c"
-
+#define B1 (3000)
+#define B1IR (3000)
+#define B2 (4400)
+#define B2IR (4700)
+#define B3 (7000)
+#define B3IR (8400)
+#define B4 (8600)
+#define B4IR (9800)
 #include "controllers/auto_testmode.c"
 
 ///// MAIN TASK /////
@@ -54,22 +61,79 @@ task main() {
 			StopTask(AutoTestControl);
 			// Drive parallel to the baskets until we are at the beacon
 			if(IR_out < 1 || IR_out > 9)
+			{
+				StartTask(Drive);
+				StartTask(AutoTestControl);
 				continue;
-			while(HTIRS2readACDir(IRSeeker) != 5)
+			}
+			resetDriveEncoder();
+			while(HTIRS2readACDir(IRSeeker) != 8)
 				runDriveMotors(FULL_IMPULSE,FULL_IMPULSE);
-			//FlagLine_DriveToBasket();
+			stopDriveMotors();
+			int enVal = readDriveEncoder();
+			if(enVal < B1IR)
+			{
+				if(enVal < ((B1IR+B2IR)/2))
+				{
+					while(readDriveEncoder() < B1)
+						runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
+				}
+				else
+				{
+					while(readDriveEncoder() > B1)
+						runDriveMotors(-HALF_IMPULSE,-HALF_IMPULSE);
+				}
+			}
+			else if(enVal < ((B2IR+B3IR)/2))
+			{
+				if(enVal < B2)
+				{
+					while(readDriveEncoder() < B2)
+						runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
+				}
+				else
+				{
+					while(readDriveEncoder() > B2)
+						runDriveMotors(-HALF_IMPULSE,-HALF_IMPULSE);
+				}
+			}
+			else if(enVal < ((B4IR+B3IR)/2))
+			{
+				if(enVal < B3)
+				{
+					while(readDriveEncoder() < B3)
+						runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
+				}
+				else
+				{
+					while(readDriveEncoder() > B3)
+						runDriveMotors(-HALF_IMPULSE,-HALF_IMPULSE);
+				}
+			}
+			else
+			{
+				if(enVal < B4)
+				{
+					while(readDriveEncoder() < B4)
+						runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
+				}
+				else
+				{
+					while(readDriveEncoder() > B4)
+						runDriveMotors(-HALF_IMPULSE,-HALF_IMPULSE);
+				}
+			}
+			stopDriveMotors();
 
-			// Lift so sonar works
-			//MoveLift(false);
-
-			// Drive up to the basket
-			//ApproachBasket();
-
-			// Dump
-			//DumpHopper();
-
-			// Lower so we can drive
-			//MoveLift(true);
+			RaiseLift();
+			resetDriveEncoder();
+			while(readDriveEncoder() > -3000)
+				runDriveMotors(HALF_IMPULSE,-HALF_IMPULSE);
+			stopDriveMotors();
+			SetHopperServos(HOPPER_MIN);
+			wait1Msec(1000);
+			SetHopperServos(HOPPER_MAX);
+			MoveLift(true);
 
 			// Return to base
 			//FlagLine_ReturnFromBasket(SonarBeforeBasketApproach);
