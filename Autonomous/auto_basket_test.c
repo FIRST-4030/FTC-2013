@@ -31,15 +31,6 @@
 #pragma debuggerWindows("joystickSimple");
 #include "auto_includes.h"
 #include "drive/drive_tank.c"
-#define B1 (3000)
-#define B1IR (3000)
-#define B2 (4400)
-#define B2IR (4700)
-#define B3 (7000)
-#define B3IR (8400)
-#define B4 (8600)
-#define B4IR (9800)
-#include "controllers/auto_testmode.c"
 
 ///// MAIN TASK /////
 task main() {
