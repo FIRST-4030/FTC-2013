@@ -1,6 +1,7 @@
 #ifndef FTC_DRIVE
 #define FTC_DRIVE
 
+#define BLIPS_PER_DEGREE (2750.0 / 90.0)
 
 // Motor Speeds //
 #define WHEEL_MAX (100)
@@ -29,6 +30,7 @@ void driveToDistance(int distance, int speed) {
 
 	// Always stop when we're done
 	stopDriveMotors();
+	wait1Msec(100);
 }
 
 // Drive to target encoder value
@@ -66,6 +68,7 @@ void turnInPlace(int distance, int speed, bool left = true) {
 	// Turn right if requested
 	if (!left) {
 		speed *= -1;
+		distance *= -1;
 	}
 
 	// Reset the encode and start driving
@@ -83,6 +86,10 @@ void turnInPlace(int distance, int speed, bool left = true) {
 
 	// Always stop when we're done
 	stopDriveMotors();
+}
+
+void turnInPlaceDegrees(int degrees, int speed, bool left = true) {
+	turnInPlace((BLIPS_PER_DEGREE * (float)degrees), speed, left);
 }
 
 // Drive until we hit the specified color

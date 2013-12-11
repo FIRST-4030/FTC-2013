@@ -43,102 +43,62 @@
 
 ///// MAIN TASK /////
 task main() {
+
 	AutonomousInit();
+	START_SIDE side = RIGHT;
+
 	// Wait for the beginning of autonomous phase.
 	//waitForStart();
-	StartTask(Drive);
-	StartTask(AutoTestControl);
-	while(true)
-	{
-		getJoystickSettings(joystick);
-		IR_out = HTIRS2readACDir(IRSeeker);
-		motorEncoder_out = readDriveEncoder();
-		if(joystick.joy1_TopHat == 0 || joystick.joy1_TopHat == 4)
-			resetDriveEncoder();
-		if(joy1Btn(9) == 1)
-		{
-			StopTask(Drive);
-			StopTask(AutoTestControl);
-			// Drive parallel to the baskets until we are at the beacon
-			if(IR_out < 1 || IR_out > 9)
-			{
-				StartTask(Drive);
-				StartTask(AutoTestControl);
-				continue;
-			}
-			resetDriveEncoder();
-			while(HTIRS2readACDir(IRSeeker) != 8)
-				runDriveMotors(FULL_IMPULSE,FULL_IMPULSE);
-			stopDriveMotors();
-			int enVal = readDriveEncoder();
-			if(enVal < B1IR)
-			{
-				if(enVal < ((B1IR+B2IR)/2))
-				{
-					while(readDriveEncoder() < B1)
-						runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
-				}
-				else
-				{
-					while(readDriveEncoder() > B1)
-						runDriveMotors(-HALF_IMPULSE,-HALF_IMPULSE);
-				}
-			}
-			else if(enVal < ((B2IR+B3IR)/2))
-			{
-				if(enVal < B2)
-				{
-					while(readDriveEncoder() < B2)
-						runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
-				}
-				else
-				{
-					while(readDriveEncoder() > B2)
-						runDriveMotors(-HALF_IMPULSE,-HALF_IMPULSE);
-				}
-			}
-			else if(enVal < ((B4IR+B3IR)/2))
-			{
-				if(enVal < B3)
-				{
-					while(readDriveEncoder() < B3)
-						runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
-				}
-				else
-				{
-					while(readDriveEncoder() > B3)
-						runDriveMotors(-HALF_IMPULSE,-HALF_IMPULSE);
-				}
-			}
-			else
-			{
-				if(enVal < B4)
-				{
-					while(readDriveEncoder() < B4)
-						runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
-				}
-				else
-				{
-					while(readDriveEncoder() > B4)
-						runDriveMotors(-HALF_IMPULSE,-HALF_IMPULSE);
-				}
-			}
-			stopDriveMotors();
 
-			RaiseLift();
-			resetDriveEncoder();
-			while(readDriveEncoder() > -3000)
-				runDriveMotors(HALF_IMPULSE,-HALF_IMPULSE);
-			stopDriveMotors();
-			SetHopperServos(HOPPER_MIN);
-			wait1Msec(1000);
-			SetHopperServos(HOPPER_MAX);
-			MoveLift(true);
+	// Drive to the IR beacon, recording our distance
+	resetDriveEncoder();
+	bool validIR = driveToIR();
+	int traveled = readDriveEncoder();
 
-			// Return to base
-			//FlagLine_ReturnFromBasket(SonarBeforeBasketApproach);
-			StartTask(Drive);
-			StartTask(AutoTestControl);
+	// Figure out which basket we're at
+	// If we didn't get a valid IR run, prefer the 2nd basket
+	int basket = 1;
+	if (validIR) {
+		// If nothing matches we're at the first basket, so default to 0 if IR is valid
+		basket = 0;
+		for (int i = NUM_BASKETS - 1; i > 0; i--) {
+			// Since the sensor is behind the midpoint we should always overshoot
+			if (traveled >= basketPositions[side][i]) {
+				basket = i;
+				break;
+			}
 		}
 	}
+
+	// Adjust back to the correct turn point for the selected basket
+	int adjustSpeed = HALF_IMPULSE;
+	int adjustDistance = (basketPositions[side][basket] - traveled);
+	if (adjustDistance < 0) {
+		adjustSpeed *= -1;
+	}
+	driveToDistance(adjustDistance, adjustSpeed);
+
+	// Turn to face baskets
+	turnInPlaceDegrees(90, HALF_IMPULSE, (bool)side);
+
+	// Raise lift so sonar works (and so we can dump)
+	MoveLift(false);
+
+	// Move forward to basket
+	ApproachBasket();
+
+	// Dump
+	DumpHopper();
+
+	// Nudge back for safety
+	driveToDistance(-1000, -FULL_IMPULSE);
+
+	// Lower so we can drive
+	MoveLift(true);
+
+	// Turn back to original orientation
+	turnInPlaceDegrees(90, HALF_IMPULSE, (!(bool)side));
+
+	// Drive backward to the corner
+	driveToDistance((-1 * (traveled + adjustDistance)), -FULL_IMPULSE);
 }
