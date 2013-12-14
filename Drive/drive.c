@@ -1,7 +1,7 @@
 #ifndef FTC_DRIVE
 #define FTC_DRIVE
 
-#define BLIPS_PER_DEGREE (2750.0 / 90.0)
+#define BLIPS_PER_DEGREE (2900.0 / 90.0)
 
 // Motor Speeds //
 #define WHEEL_MAX (100)
@@ -13,6 +13,11 @@ void driveToDistance(int distance, int speed) {
 	// Sanity check
 	if (distance == 0) {
 		return;
+	}
+
+	// Ensure the distance and the speed have the same sign
+	if ((speed < 0 && distance > 0) || (speed > 0 && distance < 0)) {
+		distance *= -1;
 	}
 
 	// Reset the encode and start driving
