@@ -5,7 +5,7 @@
 // Put functions here which do specific actions on the robot. //
 
 void MoveLift(bool down = true) {
-	int wait = 4100;
+	int wait = 3800;
 	int speed = LIFT_SPEED;
 
 	if (!down) {
@@ -44,15 +44,16 @@ void DumpHopper() {
 	SetHopperServos(HOPPER_DUMP);
 	wait1Msec(500);
 	DriveSpinnerMotor(30);
-	wait1Msec(750);
-	DriveSpinnerMotor(50);
 	wait1Msec(500);
+	DriveSpinnerMotor(50);
+	wait1Msec(250);
 	StopSpinnerMotor();
 	SetHopperServos(HOPPER_MAX);
 }
 
 void SonarFailed() {
-	driveToDistance(1200, HALF_IMPULSE);
+	driveToDistance(50, HALF_IMPULSE);
+	//driveToDistance(1400, HALF_IMPULSE);
 	return;
 }
 

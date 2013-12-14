@@ -32,6 +32,19 @@
 #include "auto_includes.h"
 #include "drive/drive_tank.c"
 
+bool IS_LIFT_UP = false;
+task liftUp() {
+	IS_LIFT_UP = false;
+	MoveLift(false);
+	IS_LIFT_UP = true;
+}
+
+task liftDown() {
+	IS_LIFT_UP = true;
+	MoveLift(true);
+	IS_LIFT_UP = false;
+}
+
 ///// MAIN TASK /////
 task main() {
 
@@ -39,7 +52,10 @@ task main() {
 	START_SIDE side = RIGHT;
 
 	// Wait for the beginning of autonomous phase.
-	//waitForStart();
+	waitForStart();
+
+	// Start raising the lift so it's ready when we arrive
+	StartTask(liftUp);
 
 	// Drive to the IR beacon, recording our distance
 	resetDriveEncoder();
@@ -63,7 +79,25 @@ task main() {
 
 	// Adjust back to the correct turn point for the selected basket
 	int adjustSpeed = HALF_IMPULSE;
-	int adjustDistance = (basketPositions[side][basket] - traveled);
+	int adjustDistance = 0;
+	// In theory we can just drive to the basket position but our encoder
+	// is pretty sloppy, so put more trust in the IR when available
+	if (validIR) {
+
+		// Back up a bit to get aligned -- alignment varies between baskets 1/2 and 3/4
+		if (basket > 1) {
+			adjustDistance = -1000;
+		} else {
+			adjustDistance = -400;
+		}
+
+		// We don't turn symetrically, so adjust when we're starting on the left
+		if (START_SIDE == LEFT) {
+			adjustDistance += 400;
+		}
+	} else {
+		adjustDistance = (basketPositions[side][basket] - traveled);
+	}
 	if (adjustDistance < 0) {
 		adjustSpeed *= -1;
 	}
@@ -72,8 +106,10 @@ task main() {
 	// Turn to face baskets
 	turnInPlaceDegrees(90, HALF_IMPULSE, (bool)side);
 
-	// Raise lift so sonar works (and so we can dump)
-	MoveLift(false);
+	// Wait for the lift to be up
+	while (!IS_LIFT_UP) {
+		wait1Msec(100);
+	}
 
 	// Move forward to basket
 	ApproachBasket();
@@ -82,14 +118,29 @@ task main() {
 	DumpHopper();
 
 	// Nudge back for safety
-	driveToDistance(-1000, -FULL_IMPULSE);
+	driveToDistance(-400, -FULL_IMPULSE);
 
-	// Lower so we can drive
-	MoveLift(true);
+	// Star lowering the lift
+	StartTask(liftDown);
 
 	// Turn back to original orientation
-	turnInPlaceDegrees(90, HALF_IMPULSE, (!(bool)side));
+	turnInPlaceDegrees(90, FULL_IMPULSE, (!(bool)side));
 
 	// Drive backward to the corner
 	driveToDistance((-1 * (traveled + adjustDistance)), -FULL_IMPULSE);
+
+	// Drive back some more to get aligned with the wall
+	driveToDistance(-3000, -FULL_IMPULSE);
+
+	// Turn to avoid ramp
+	turnInPlaceDegrees(70, FULL_IMPULSE, (bool)side);
+
+	// Drive to white line
+	driveToColor(WHITE, FULL_IMPULSE);
+
+	// Turn to ramp
+	turnInPlaceDegrees(95, FULL_IMPULSE);
+
+	// Drive up ramp
+	driveToDistance(8000, FULL_IMPULSE);
 }

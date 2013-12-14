@@ -11,10 +11,10 @@ typedef enum {
 int basketPositions[NUM_START_SIDES][NUM_BASKETS];
 
 void initBasketPositions() {
-	basketPositions[LEFT][0] = 3000;
-	basketPositions[LEFT][1] = 4400;
-	basketPositions[LEFT][2] = 7000;
-	basketPositions[LEFT][3] = 8400;
+	basketPositions[LEFT][0] = 150;
+	basketPositions[LEFT][1] = 2200;
+	basketPositions[LEFT][2] = 4850;
+	basketPositions[LEFT][3] = 6600;
 
 	basketPositions[RIGHT][0] = 150;
 	basketPositions[RIGHT][1] = 2200;
@@ -41,5 +41,8 @@ void AutonomousInit() {
 
 	// Stop All Drive Motors //
 	stopDriveMotors();
+
+	// Enable the light sensors
+	FlashLights(1, 0);
 }
 #endif
