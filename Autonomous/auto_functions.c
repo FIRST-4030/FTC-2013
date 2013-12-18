@@ -170,6 +170,11 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	}
 	driveToDistance(adjustDistance, adjustSpeed);
 
+	// Warn if we didn't detect an IR beacon
+	if (!validIR) {
+		FlashLights(5, 200);
+	}
+
 	// Turn to face baskets
 	turnInPlaceDegrees(90, HALF_IMPULSE, (bool)side);
 
