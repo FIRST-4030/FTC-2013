@@ -153,9 +153,9 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 
 		// Back up a bit to get aligned -- alignment varies between baskets 1/2 and 3/4
 		if (basket > 1) {
-			adjustDistance = -1000;
+			adjustDistance = -700;
 		} else {
-			adjustDistance = -400;
+			adjustDistance = -100;
 		}
 
 		// We don't turn symetrically, so adjust when we're starting on the left
@@ -174,7 +174,6 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	if (!validIR) {
 		FlashLights(5, 200);
 	}
-
 	// Turn to face baskets
 	turnInPlaceDegrees(90, HALF_IMPULSE, (bool)side);
 
