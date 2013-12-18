@@ -4,39 +4,16 @@
 // Autonomous Mode Operational Functions //
 // Put functions here which do specific actions on the robot. //
 
-void MoveLift(bool down = true) {
-	int wait = 3800;
+void MoveLift(bool down = true, int duration = 3800) {
 	int speed = LIFT_SPEED;
-
 	if (!down) {
 		speed *= -1;
 		// Run longer up than down
-		wait += 800;
+		duration += 800;
 	}
 
 	DriveLiftMotor(speed);
-	wait1Msec(wait);
-	DriveLiftMotor(0);
-}
-
-void RaiseLift() {
-	MoveLift(false);
-}
-
-void DumpHopperByLoweringIt(){
-	SetHopperServos(HOPPER_MIN);
-}
-
-void PrepareToDump() {
-	// Deploy hopper
-	// This operation is not instantaneous but the function does return instantly.
-	// It takes a couple seconds for the hopper to deploy. Calling this prior to
-	// DriveLiftMotor() will allow the hopper to deploy while the lift goes up.
-	SetHopperServos(HOPPER_DUMP);
-
-	// Lift
-	DriveLiftMotor(-LIFT_SPEED);
-	wait1Msec(4500);
+	wait1Msec(duration);
 	DriveLiftMotor(0);
 }
 
@@ -53,7 +30,6 @@ void DumpHopper() {
 
 void SonarFailed() {
 	driveToDistance(50, HALF_IMPULSE);
-	//driveToDistance(1400, HALF_IMPULSE);
 	return;
 }
 
@@ -112,29 +88,6 @@ bool driveToIR() {
 
 	// If all went well, return true
 	return true;
-}
-
-// Start Same as OnFlagLineRightCorner_Basket //
-// Turns, finds line, follows line up on ramp and stops //
-void FlagLine_FollowLineToRamp(bool reverse = false) {
-	// Turn Left Dead Reckoning //
-	if (reverse) {
-		driveMotors(HALF_IMPULSE,-1 * HALF_IMPULSE, 900);
-	} else {
-		driveMotors(-1 * HALF_IMPULSE, HALF_IMPULSE, 900);
-	}
-
-	// Forward to white line
-	driveToColor(WHITE, QUARTER_IMPULSE);
-
-	// Align with white line
-	alignLine(WHITE, QUARTER_IMPULSE, BLACK, reverse);
-
-	// Follow line to ramp
-	followLineToColor(WHITE, HALF_IMPULSE, BLACK);
-
-	// Rear Light Sensor is Mounted about 2" in front of wheels //
-	driveMotors(FULL_IMPULSE, FULL_IMPULSE, 500);
 }
 
 void Wall_DirectToRamp() {
