@@ -33,5 +33,5 @@
 
 ///// MAIN TASK /////
 task main() {
-		MoveLift(false, 250);
+		MoveLift(false, 500);
 }
