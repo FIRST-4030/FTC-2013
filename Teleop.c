@@ -56,8 +56,13 @@ task main()
 		}
 
 		//Flag // Right Joystick //
-		if(joystick.joy2_y2 > threshold) {
-			DriveFlagMotor(joystick.joy2_y2);
+		if(abs(joystick.joy2_y2) > threshold) {
+			int flagSpeed = joystick.joy2_y2;
+			if (flagSpeed > 0) {
+				flagSpeed *= -1;
+			}
+			flagSpeed = (100.0/128.0)*(float)flagSpeed;
+			DriveFlagMotor(flagSpeed);
 		}	else {
 			DriveFlagMotor(0);
 		}
