@@ -4,16 +4,24 @@
 // Autonomous Mode Operational Functions //
 // Put functions here which do specific actions on the robot. //
 
-void MoveLift(bool down = true, int duration = 3800) {
+void MoveLift(bool down = true, int duration = 0) {
 	int speed = LIFT_SPEED;
+
+	// Run longer up than down
+	int wait = 3800;
 	if (!down) {
 		speed *= -1;
-		// Run longer up than down
-		duration += 800;
+		wait += 800;
 	}
 
+	// Respect a specific run duration, if provided
+	if (duration > 0) {
+		wait = duration;
+	}
+
+	// Run the lift
 	DriveLiftMotor(speed);
-	wait1Msec(duration);
+	wait1Msec(wait);
 	DriveLiftMotor(0);
 }
 
