@@ -4,8 +4,6 @@
 ///// INITIALIZE ROBOT /////
 void initializeRobot()
 {
-	wait1Msec(1000);
-
 	// Initialize Motor Encoders //
 	nMotorEncoder[leftRearMotor] = 0;
 
