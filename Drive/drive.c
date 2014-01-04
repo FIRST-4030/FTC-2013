@@ -131,12 +131,17 @@ void DriveSpinnerMotor(int power)
 }
 
 void StopSpinnerMotor() {
-	motor[spinnerMotor] = 0;
+	DriveSpinnerMotor(0);
 }
 
 void DriveFlagMotor(int power)
 {
-	motor[flagMotor] = power;
+	motor[flagMotorA] = power;
+	motor[flagMotorB] = power;
+}
+
+void StopFlagMotor() {
+	DriveFlagMotor(0);
 }
 
 void DriveWinchMotors(int power)
