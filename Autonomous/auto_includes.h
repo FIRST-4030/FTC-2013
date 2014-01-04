@@ -7,7 +7,7 @@
 #include "../drivers/lego-touch.h"
 #include "../drivers/lego-light.h"
 ///// Sensor Multiplexer Interface /////
-const tMUXSensor sonar = msensor_S2_1;
+const tMUXSensor sonarSensor = msensor_S2_1;
 const tMUXSensor IRSeeker = msensor_S2_2;
 const tMUXSensor lightRight = msensor_S2_3;
 const tMUXSensor lightLeft = msensor_S2_4;

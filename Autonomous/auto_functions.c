@@ -42,7 +42,7 @@ void SonarFailed() {
 }
 
 void ApproachBasket() {
-	int range = USreadDist(sonar);
+	int range = USreadDist(sonarSensor);
 
 	// Ensure sonar is sane
 	if (range < 10 || range > 100) {
@@ -55,7 +55,7 @@ void ApproachBasket() {
 	return;
 
 	// Drive forward to set distance
-	while(USreadDist(sonar) > 41 ) {
+	while(USreadDist(sonarSensor) > 41 ) {
 		//runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
 		if(HTIRS2readACDir(IRSeeker) < 5)
 			runDriveMotors(QUARTER_IMPULSE,HALF_IMPULSE); // slight left turn
