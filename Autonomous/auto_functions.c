@@ -79,7 +79,7 @@ bool driveToIR() {
 	// Ensure we have a valid IR reading, otherwise return immediately
 	int seeker = HTIRS2readACDir(IRSeeker);
 	if (!seekerValid(seeker)) {
-		FlashLights(5, 200);
+		FlashLights(3, 200);
 		return false;
 	}
 
@@ -213,6 +213,6 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	turnInPlaceDegrees(95, FULL_IMPULSE);
 
 	// Drive up ramp
-	driveToDistance(8000, FULL_IMPULSE);
+	driveToDistance(7500, FULL_IMPULSE);
 }
 #endif

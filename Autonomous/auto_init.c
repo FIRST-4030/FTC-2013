@@ -11,12 +11,12 @@ typedef enum {
 int basketPositions[NUM_START_SIDES][NUM_BASKETS];
 
 void initBasketPositions() {
-	basketPositions[LEFT][0] = 500;
+	basketPositions[LEFT][0] = 1250;
 	basketPositions[LEFT][1] = 2200;
 	basketPositions[LEFT][2] = 4850;
 	basketPositions[LEFT][3] = 6600;
 
-	basketPositions[RIGHT][0] = 500;
+	basketPositions[RIGHT][0] = 1250;
 	basketPositions[RIGHT][1] = 2200;
 	basketPositions[RIGHT][2] = 4850;
 	basketPositions[RIGHT][3] = 6600;

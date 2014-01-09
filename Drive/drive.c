@@ -1,7 +1,7 @@
 #ifndef FTC_DRIVE
 #define FTC_DRIVE
 
-#define BLIPS_PER_DEGREE (2900.0 / 90.0)
+#define BLIPS_PER_DEGREE (2800.0 / 90.0)
 
 // Motor Speeds //
 #define WHEEL_MAX (100)
