@@ -37,7 +37,7 @@ void DumpHopper() {
 }
 
 void SonarFailed() {
-	driveToDistance(50, HALF_IMPULSE);
+	driveToDistance(HALF_IMPULSE, 75);
 	return;
 }
 
@@ -79,7 +79,6 @@ bool driveToIR() {
 	// Ensure we have a valid IR reading, otherwise return immediately
 	int seeker = HTIRS2readACDir(IRSeeker);
 	if (!seekerValid(seeker)) {
-		FlashLights(3, 200);
 		return false;
 	}
 
@@ -88,7 +87,6 @@ bool driveToIR() {
 		runDriveMotors(FULL_IMPULSE,FULL_IMPULSE);
 		seeker = HTIRS2readACDir(IRSeeker);
 		if (!seekerValid(seeker)) {
-			FlashLights(5, 200);
 			return false;
 		}
 	}
@@ -168,14 +166,14 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	if (adjustDistance < 0) {
 		adjustSpeed *= -1;
 	}
-	driveToDistance(adjustDistance, adjustSpeed);
+	driveToDistance(adjustSpeed, adjustDistance);
 
 	// Warn if we didn't detect an IR beacon
 	if (!validIR) {
-		FlashLights(5, 200);
+		FlashLights(3, 200);
 	}
 	// Turn to face baskets
-	turnInPlaceDegrees(90, HALF_IMPULSE, (bool)side);
+	turnInPlaceDegrees(90, (bool)side);
 
 	// Wait for the lift to be up
 	while (!IS_LIFT_UP) {
@@ -189,30 +187,30 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	DumpHopper();
 
 	// Nudge back for safety
-	driveToDistance(-400, -FULL_IMPULSE);
+	driveToDistance(-FULL_IMPULSE, -400);
 
 	// Star lowering the lift
 	StartTask(liftDown);
 
 	// Turn back to original orientation
-	turnInPlaceDegrees(90, FULL_IMPULSE, (!(bool)side));
+	turnInPlaceDegrees(90, (!(bool)side));
 
 	// Drive backward to the corner
-	driveToDistance((-1 * (traveled + adjustDistance)), -FULL_IMPULSE);
+	driveToDistance(-FULL_IMPULSE, (-1 * (traveled + adjustDistance)), 10000);
 
 	// Drive back some more to get aligned with the wall
-	driveToDistance(-3000, -FULL_IMPULSE);
+	driveToDistance(-FULL_IMPULSE, -3500);
 
 	// Turn to avoid ramp
-	turnInPlaceDegrees(70, FULL_IMPULSE, (bool)side);
+	turnInPlaceDegrees(60, (bool)side);
 
 	// Drive to white line
-	driveToColor(WHITE, FULL_IMPULSE);
+	driveToColor(FULL_IMPULSE, WHITE);
 
 	// Turn to ramp
-	turnInPlaceDegrees(95, FULL_IMPULSE);
+	turnInPlaceDegrees(95, (!(bool)side));
 
 	// Drive up ramp
-	driveToDistance(7500, FULL_IMPULSE);
+	driveToDistance(FULL_IMPULSE, 7250);
 }
 #endif

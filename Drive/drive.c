@@ -1,108 +1,81 @@
 #ifndef FTC_DRIVE
 #define FTC_DRIVE
 
-#define BLIPS_PER_DEGREE (2800.0 / 90.0)
+#define TURN_DEGREE_SPEED (75)
+#define BLIPS_PER_DEGREE (2650.0 / 90.0)
 
 // Motor Speeds //
 #define WHEEL_MAX (100)
 #define LIFT_SPEED (75)
 #define WINCH_SPEED (100)
 
-// Drive until we exceed the specified distance
-void driveToDistance(int distance, int speed) {
-	// Sanity check
-	if (distance == 0) {
+// Drive until we hit any of the specified parameters
+void driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int time = 5000, bool turn = false) {
+	// Ensure the time is less than 32k (16-bit timer limit)
+	if (time > 32000) {
+		time = 32000;
+	}
+
+	// Sanity checks -- we need a valid speed and at least one stop paramter
+	if (speed == 0) {
+		return;
+	} else if (distance == 0 && color == UNKNOWN && time == 0) {
 		return;
 	}
 
-	// Ensure the distance and the speed have the same sign
-	if ((speed < 0 && distance > 0) || (speed > 0 && distance < 0)) {
-		distance *= -1;
-	}
+	// Assume the sign of our speed and distance match (they must to be sane)
+	distance = abs(distance);
 
-	// Reset the encode and start driving
+	// Reset the encoder and timer
 	resetDriveEncoder();
-	runDriveMotors(speed, speed);
+	ClearTimer(T1);
+
+	// Drive straight or turn
+	if (turn) {
+		runDriveMotors(-speed, speed);
+	} else {
+		runDriveMotors(speed, speed);
+	}
 
 	// Loop until we hit a stop condition
 	while (true) {
-		if (distance > 0 && readDriveEncoder() > distance) {
+		if (color != UNKNOWN && (onColor(color, LSvalRaw(lineLeft)) || onColor(color, LSvalRaw(lineRight)))) {
 			break;
-		} else if (distance < 0 && readDriveEncoder() < distance) {
+		} else if (distance != 0 && (abs(readDriveEncoder()) > distance)) {
+			break;
+		} else if (time != 0 && (time1[T1] > time)) {
 			break;
 		}
 	}
 
-	// Always stop when we're done
+	// Always stop for just a moment when we're done
 	stopDriveMotors();
-	wait1Msec(100);
+	wait1Msec(50);
 }
 
-// Drive to target encoder value
-void driveToTargetValue(int target, int speed)
-{
-	driveToDistance(target-readDriveEncoder(),speed);
+// Shorthand for distance-based driving
+void driveToDistance(int speed, int distance, int time = 5000) {
+	driveToParam(speed, distance, UNKNOWN, time, false);
 }
 
-void driveToNearestBasket(int speed)
-{
-	int enVal = readDriveEncoder();
-	// B1 = 3000		2500
-		// div = 3600
-	// B2 = 4400
-		// div = 5700
-	// B3 = 7000
-		// div 7700
-	// B4 = 8400
-	if(enVal < 3600)
-		driveToTargetValue(3000,speed);
-	else if(enVal < 5700)
-		driveToTargetValue(4400,speed);
-	else if(enVal < 7700)
-		driveToTargetValue(7000,speed);
-	else
-		driveToTargetValue(8400,speed);
-}
-
-void turnInPlace(int distance, int speed, bool left = true) {
-	// Sanity check
-	if (distance == 0) {
-		return;
-	}
-
+// Shorthand for in-place turns
+void turnInPlace(int speed, int distance, bool left = true, int time = 5000) {
 	// Turn right if requested
 	if (!left) {
 		speed *= -1;
 		distance *= -1;
 	}
-
-	// Reset the encode and start driving
-	resetDriveEncoder();
-	runDriveMotors(-speed, speed);
-
-	// Loop until we hit a stop condition
-	while (true) {
-		if (distance > 0 && readDriveEncoder() > distance) {
-			break;
-		} else if (distance < 0 && readDriveEncoder() < distance) {
-			break;
-		}
-	}
-
-	// Always stop when we're done
-	stopDriveMotors();
+	driveToParam(speed, distance, UNKNOWN, time, true);
 }
 
-void turnInPlaceDegrees(int degrees, int speed, bool left = true) {
-	turnInPlace((BLIPS_PER_DEGREE * (float)degrees), speed, left);
+// Translate via BLIPS_PER_DEGREE for ease-of-use
+void turnInPlaceDegrees(int degrees, bool left = true, int time = 5000) {
+	turnInPlace(TURN_DEGREE_SPEED, (BLIPS_PER_DEGREE * (float)degrees), left, time);
 }
 
 // Drive until we hit the specified color
-void driveToColor(FloorColor color, int speed) {
-	while (!onColor(color, LSvalRaw(lineLeft)) && !onColor(color, LSvalRaw(lineRight))) {
-		runDriveMotors(speed, speed);
-	}
-	stopDriveMotors();
+void driveToColor(int speed, FloorColor color, int time = 0) {
+	driveToParam(speed, 0, color, time, false);
 }
 
 // Direct Drive Functions //
