@@ -198,11 +198,11 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	// Drive backward to the corner
 	driveToDistance(-FULL_IMPULSE, (-1 * (traveled + adjustDistance)), 10000);
 
-	// Drive back some more to get aligned with the wall
-	driveToDistance(-FULL_IMPULSE, -3500);
+	// Nudge back just a bit to be sure we're at the wall
+	driveToDistance(-HALF_IMPULSE, -250);
 
-	// Turn to avoid ramp
-	turnInPlaceDegrees(60, (bool)side);
+	// Turn to avoid the ramp
+	turnInPlaceDegrees(97, (bool)side);
 
 	// Drive to white line
 	driveToColor(FULL_IMPULSE, WHITE);
