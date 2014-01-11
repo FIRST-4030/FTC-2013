@@ -1,24 +1,22 @@
 #ifndef FTC_TELEOP_INCLUDES
 #define FTC_TELEOP_INCLUDES
 
-// Sensor Includes //
-#include "drivers/hitechnic-sensormux.h"
-#include "drivers/lego-light.h"
 ///// Sensor Multiplexer Interface /////
-const tMUXSensor sonar = msensor_S2_1;
+#include "drivers/hitechnic-sensormux.h"
+const tMUXSensor sonarSensor = msensor_S2_1;
 const tMUXSensor IRSeeker = msensor_S2_2;
 const tMUXSensor lightRight = msensor_S2_3;
 const tMUXSensor lightLeft = msensor_S2_4;
-// Light Sensor Functions //
-#include "sensors/lights.c"
 
 // Teleop Includes
 #include "JoystickDriver.c"
-#include "sensors/colors.c"
-#include "motors/servos.c"
-#include "motors/motors.c"
-#include "drive/lines.c"
-#include "drive/drive.c"
+#include "Sensors/light.c"
+#include "Sensors/ir.c"
+#include "Sensors/sonar.c"
+#include "Motors/servos.c"
+#include "Motors/motors.c"
+#include "Drive/lines.c"
+#include "Drive/drive.c"
 
 #include "init_robot.c";
 

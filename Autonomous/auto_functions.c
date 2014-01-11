@@ -41,57 +41,6 @@ void SonarFailed() {
 	return;
 }
 
-void ApproachBasket() {
-	int range = USreadDist(sonarSensor);
-
-	// Ensure sonar is sane
-	if (range < 10 || range > 1000) {
-		SonarFailed();
-		return;
-	}
-
-	// Until all is tested, always use SonarFailed()
-	SonarFailed();
-	return;
-
-	// Drive forward to set distance
-	while(USreadDist(sonarSensor) > 395) {
-		runDriveMotors(HALF_IMPULSE,HALF_IMPULSE);
-	}
-	stopDriveMotors();
-}
-
-// Return true if the provided value is a valid IR seeker value
-bool seekerValid(int seeker) {
-	if (seeker < 1) {
-		return false;
-	} else if (seeker > 8) {
-		return false;
-	}
-	return true;
-}
-
-bool driveToIR() {
-	// Ensure we have a valid IR reading, otherwise return immediately
-	int seeker = HTIRS2readACDir(IRSeeker);
-	if (!seekerValid(seeker)) {
-		return false;
-	}
-
-	// Drive until we are beside the IR beacon, exiting if we lose the IR signal
-	while(seeker != 5) {
-		runDriveMotors(FULL_IMPULSE,FULL_IMPULSE);
-		seeker = HTIRS2readACDir(IRSeeker);
-		if (!seekerValid(seeker)) {
-			return false;
-		}
-	}
-	stopDriveMotors();
-
-	// If all went well, return true
-	return true;
-}
-
 void Wall_DirectToRamp() {
 	resetDriveEncoder();
 
@@ -120,7 +69,7 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 
 	// Drive to the IR beacon, recording our distance
 	resetDriveEncoder();
-	bool validIR = driveToIR();
+	bool validIR = driveToIR(FULL_IMPULSE, 5, 10000);
 	int traveled = readDriveEncoder();
 
 	// Figure out which basket we're at
@@ -177,7 +126,10 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	}
 
 	// Move forward to basket
-	ApproachBasket();
+	// In theory we want sonar reading 395, but it's a bit flaky, so always use the fail behavior
+	//if (!driveToParam(HALF_IMPULSE, 0, UNKNOWN, 2500, false, 0, 395)) {
+		driveToDistance(HALF_IMPULSE, 75);
+	//}
 
 	// Dump
 	DumpHopper();

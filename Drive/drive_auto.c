@@ -11,7 +11,6 @@
 #define WALL_TO_MID (3000)
 
 bool STARTED_ON_LEFT = true;
-int motorEncoder_out = 0;
 int B2I(int x)
 {
 	return x / BLIPS_PER_INCH;

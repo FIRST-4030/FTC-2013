@@ -1,5 +1,8 @@
 #ifndef FTC_COLORS
 #define FTC_COLORS
+
+#include "../drivers/lego-light.h"
+
 // Which colors can we detect
 typedef enum {
 	BLACK,
@@ -19,10 +22,6 @@ typedef struct {
 
 // Global storage for our configured color set
 ColorRange COLORS[NUM_COLORS];
-int IR_out = 0;
-int Sonar_out = 0;
-int LightRight_out = 0;
-int LightLeft_out = 0;
 
 void setLightSensorHeight(float height) {
 	// 0.5" calibration
@@ -113,6 +112,17 @@ bool onBlue(int sensorVal) {
 
 bool onRed(int sensorVal) {
 	return onColor(RED, sensorVal);
+}
+
+void FlashLights(int times, int delay) {
+	for(int i=0; i < times; i++) {
+		LSsetInactive(lightRight);
+	  LSsetInactive(lightLeft);
+		wait1Msec(delay);
+	  LSsetActive(lightRight);
+  	LSsetActive(lightLeft);
+		wait1Msec(delay);
+	}
 }
 
 #endif

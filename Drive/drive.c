@@ -10,7 +10,7 @@
 #define WINCH_SPEED (100)
 
 // Drive until we hit any of the specified parameters
-void driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int time = 5000, bool turn = false) {
+bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int time = 5000, bool turn = false, int ir = 0, int sonar = 0) {
 	// Ensure the time is less than 32k (16-bit timer limit)
 	if (time > 32000) {
 		time = 32000;
@@ -18,13 +18,15 @@ void driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 
 	// Sanity checks -- we need a valid speed and at least one stop paramter
 	if (speed == 0) {
-		return;
-	} else if (distance == 0 && color == UNKNOWN && time == 0) {
-		return;
+		return false;
+	} else if (distance == 0 && color == UNKNOWN && time == 0 && ir == 0 && sonar == 0) {
+		return false;
 	}
 
-	// Assume the sign of our speed and distance match (they must to be sane)
-	distance = abs(distance);
+	// Ensure the sign of our speed and distance match (they must to be sane)
+	if (speed * distance < 0) {
+		distance *= -1;
+	}
 
 	// Reset the encoder and timer
 	resetDriveEncoder();
@@ -37,6 +39,9 @@ void driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 		runDriveMotors(speed, speed);
 	}
 
+	// Track sensor failures
+	bool failed = false;
+
 	// Loop until we hit a stop condition
 	while (true) {
 		if (color != UNKNOWN && (onColor(color, LSvalRaw(lineLeft)) || onColor(color, LSvalRaw(lineRight)))) {
@@ -45,17 +50,59 @@ void driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 			break;
 		} else if (time != 0 && (time1[T1] > time)) {
 			break;
+		} else if (ir != 0) {
+			int irVal = readIR();
+
+			// Stop if the IR reading is invalid
+			if (!irValid(irVal)) {
+				failed = true;
+				break;
+			}
+
+			// Stop when we hit he IR target
+			if (ir == irVal) {
+				break;
+			}
+		} else if (sonar != 0) {
+			int sonarVal = readSonar();
+
+			// Stop if the sonar reading is invalid
+			if (!sonarValid(sonarVal)) {
+				failed = true;
+				break;
+			}
+
+			// Approach when speed is > 0, recede with speed < 0
+			if (
+				(speed > 0 && (sonarVal < sonar)) ||
+				(speed < 0 && (sonarVal > abs(sonar)))
+			) {
+				break;
+			}
 		}
 	}
 
 	// Always stop for just a moment when we're done
 	stopDriveMotors();
 	wait1Msec(50);
+
+	// Return false if there was a sensor error
+	return !failed;
+}
+
+// Shorthand for IR-based driving
+bool driveToIR(int speed, int ir, int time = 5000) {
+	return driveToParam(speed, 0, UNKNOWN, time, false, ir, 0);
+}
+
+// Shorthand for sonar-based driving
+bool driveToSonar(int speed, int sonar, int time = 5000) {
+	return driveToParam(speed, 0, UNKNOWN, time, false, 0, sonar);
 }
 
 // Shorthand for distance-based driving
 void driveToDistance(int speed, int distance, int time = 5000) {
-	driveToParam(speed, distance, UNKNOWN, time, false);
+	driveToParam(speed, distance, UNKNOWN, time, false, 0, 0);
 }
 
 // Shorthand for in-place turns
@@ -65,7 +112,7 @@ void turnInPlace(int speed, int distance, bool left = true, int time = 5000) {
 		speed *= -1;
 		distance *= -1;
 	}
-	driveToParam(speed, distance, UNKNOWN, time, true);
+	driveToParam(speed, distance, UNKNOWN, time, true, 0, 0);
 }
 
 // Translate via BLIPS_PER_DEGREE for ease-of-use
