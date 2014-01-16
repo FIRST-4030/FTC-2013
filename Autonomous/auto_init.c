@@ -30,19 +30,12 @@ void AutonomousInit() {
 	servoChangeRate[leftHopper] = 2;
 	servoChangeRate[rightHopper] = 2;
 
-	SetHopperServos(HOPPER_MAX);
 	// Initialize the sensor and motor configuration
 	setLightSensorHeight(5.0);
 	setDriveMotors(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor);
 	setLineSensors(lightLeft, lightRight);
 
-	// Initialize Motor Encoders //
-	resetDriveEncoder();
-
 	// Stop All Drive Motors //
 	stopDriveMotors();
-
-	// Enable the light sensors
-	FlashLights(1, 0);
 }
 #endif
