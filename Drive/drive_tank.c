@@ -22,19 +22,27 @@ task Drive()
 		//Each of these passes a value to set the motors to under certain circumstances
 		//Left Wheels
 		if(abs(joystick.joy1_y1) > threshold){
-			int power = joystick.joy1_y1;
-			if(joy1Btn(7) == 1)
-				power = (float)power * 0.25;
-			DriveLeftSide(power);
+			if(joy1Btn(5) == 1 && joy1Btn(6) == 1) {
+				DriveLeftSide(-joystick.joy1_y1);
+			} else{
+				int power = joystick.joy1_y1;
+				if(joy1Btn(7) == 1)
+					power = (float)power * 0.25;
+				DriveLeftSide(power);
+			}
 		} else {
 			DriveLeftSide(0);
 		}
 		//Right Wheels
 		if(abs(joystick.joy1_y2) > threshold) {
-			int power = joystick.joy1_y1;
-			if(joy1Btn(7) == 1)
-				power = (float)power * 0.25;
-			DriveRightSide(joystick.joy1_y2);
+			if(joy1Btn(5) == 1 && joy1Btn(6) == 1) {
+				DriveRightSide(-joystick.joy1_y2);
+			} else {
+				int power = joystick.joy1_y1;
+				if(joy1Btn(7) == 1)
+					power = (float)power * 0.25;
+				DriveRightSide(joystick.joy1_y2);
+			}
 		}	else {
 			DriveRightSide(0);
 		}
