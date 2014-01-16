@@ -8,7 +8,7 @@ void MoveLift(bool down = true, int duration = 0) {
 	int speed = LIFT_SPEED;
 
 	// Run longer up than down
-	int wait = 3800;
+	int wait = 3400;
 	if (!down) {
 		speed *= -1;
 		wait += 800;
@@ -198,13 +198,13 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	driveToDistance(-HALF_IMPULSE, -250);
 
 	// Turn to avoid the ramp
-	turnInPlaceDegrees(97, (bool)side);
+	turnInPlaceDegrees(100, (bool)side);
 
 	// Drive to white line
 	driveToColor(FULL_IMPULSE, WHITE);
 
 	// Turn to ramp
-	turnInPlaceDegrees(95, (!(bool)side));
+	turnInPlaceDegrees(92, (!(bool)side));
 
 	// Drive up ramp
 	driveToDistance(FULL_IMPULSE, 7250);
