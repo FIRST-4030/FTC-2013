@@ -23,7 +23,7 @@ task Drive()
 		//Left Wheels
 		if(abs(joystick.joy1_y1) > threshold){
 			if(joy1Btn(5) == 1 && joy1Btn(6) == 1) {
-				DriveLeftSide(-joystick.joy1_y1);
+				DriveRightSide(-joystick.joy1_y1);
 			} else{
 				int power = joystick.joy1_y1;
 				if(joy1Btn(7) == 1)
@@ -36,7 +36,7 @@ task Drive()
 		//Right Wheels
 		if(abs(joystick.joy1_y2) > threshold) {
 			if(joy1Btn(5) == 1 && joy1Btn(6) == 1) {
-				DriveRightSide(-joystick.joy1_y2);
+				DriveLeftSide(-joystick.joy1_y2);
 			} else {
 				int power = joystick.joy1_y1;
 				if(joy1Btn(7) == 1)
