@@ -121,7 +121,7 @@ void turnInPlaceDegrees(int degrees, bool left = true, int time = 5000) {
 }
 
 // Drive until we hit the specified color
-void driveToColor(int speed, FloorColor color, int time = 0) {
+void driveToColor(int speed, FloorColor color, int time = 5000) {
 	driveToParam(speed, 0, color, time, false);
 }
 
