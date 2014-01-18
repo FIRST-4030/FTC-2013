@@ -2,10 +2,7 @@
 #define FTC_INIT_ROBOT
 
 ///// INITIALIZE ROBOT /////
-void initializeRobot()
-{
-	// Initialize Motor Encoders //
-	nMotorEncoder[leftRearMotor] = 0;
+void initializeRobot() {
 
 	// Stop All Motors //
 	motor[leftFrontMotor] = 0;
@@ -17,17 +14,21 @@ void initializeRobot()
 	motor[leftWinch] = 0;
 	motor[rightWinch] = 0;
 
-	// Set Wheels to Coast //
-	//bFloatDuringInactiveMotorPWM = true;
-
-	SetHookServos(HOOK_MIN); // Put all the way back //
+	// Medium hook rate and retracted position
+	SetHookServos(HOOK_MIN);
 	servoChangeRate[leftHook] = 2;
 	servoChangeRate[rightHook] = 2;
+
+	// Low hopper speed and retracted position
+	SetHopperServos(HOPPER_MAX);
 	servoChangeRate[leftHopper] = 1;
 	servoChangeRate[rightHopper] = 1;
 
-	return;
-}
+	// Initialize encoders
+	resetDriveEncoder();
 
+	// Enable the light sensors
+	FlashLights(1, 0);
+}
 
 #endif
