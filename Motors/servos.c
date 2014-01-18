@@ -3,7 +3,7 @@
 
 // Hopper Defines //
 #define HOPPER_MIN (60) // Put Down To Load //
-#define HOPPER_DUMP (HOPPER_MIN + 25) // Used by autonomouse //
+#define HOPPER_DUMP (HOPPER_MIN + 35) // Used by autonomouse //
 #define HOPPER_MAX (HOPPER_MIN + 80) // Put Away //
 #define HOPPER_INCR (5)
 
