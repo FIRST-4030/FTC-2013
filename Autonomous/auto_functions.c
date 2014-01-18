@@ -36,11 +36,6 @@ void DumpHopper() {
 	SetHopperServos(HOPPER_MAX);
 }
 
-void SonarFailed() {
-	driveToDistance(HALF_IMPULSE, 75);
-	return;
-}
-
 void Wall_DirectToRamp() {
 	resetDriveEncoder();
 
@@ -102,8 +97,8 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 		}
 
 		// We don't turn symetrically, so adjust when we're starting on the left
-		if (START_SIDE == LEFT) {
-			adjustDistance += 400;
+		if (side == LEFT) {
+			adjustDistance += 900;
 		}
 	} else {
 		adjustDistance = (basketPositions[side][basket] - traveled);
@@ -115,7 +110,7 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 
 	// Warn if we didn't detect an IR beacon
 	if (!validIR) {
-		FlashLights(3, 200);
+		FlashLights(3, 250);
 	}
 	// Turn to face baskets
 	turnInPlaceDegrees(90, (bool)side);
@@ -126,10 +121,12 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	}
 
 	// Move forward to basket
-	// In theory we want sonar reading 395, but it's a bit flaky, so always use the fail behavior
-	//if (!driveToParam(HALF_IMPULSE, 0, UNKNOWN, 2500, false, 0, 395)) {
+	int distance = readSonar();
+	if (!driveToParam(HALF_IMPULSE, 0, UNKNOWN, 1000, false, 0, 46)) {
+		FlashLights(3, 250);
 		driveToDistance(HALF_IMPULSE, 75);
-	//}
+	}
+	distance = readSonar();
 
 	// Dump
 	DumpHopper();
@@ -137,7 +134,7 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	// Nudge back for safety
 	driveToDistance(-FULL_IMPULSE, -400);
 
-	// Star lowering the lift
+	// Start lowering the lift
 	StartTask(liftDown);
 
 	// Turn back to original orientation
@@ -147,16 +144,16 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	driveToDistance(-FULL_IMPULSE, (-1 * (traveled + adjustDistance)), 10000);
 
 	// Nudge back just a bit to be sure we're at the wall
-	driveToDistance(-HALF_IMPULSE, -250);
+	driveToDistance(-HALF_IMPULSE, -100);
 
 	// Turn to avoid the ramp
-	turnInPlaceDegrees(100, (bool)side);
+	turnInPlaceDegrees(105, (bool)side);
 
 	// Drive to white line
 	driveToColor(FULL_IMPULSE, WHITE);
 
 	// Turn to ramp
-	turnInPlaceDegrees(92, (!(bool)side));
+	turnInPlaceDegrees(90, (!(bool)side));
 
 	// Drive up ramp
 	driveToDistance(FULL_IMPULSE, 7250);
