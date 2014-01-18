@@ -16,17 +16,15 @@ bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 		time = 32000;
 	}
 
-	// Sanity checks -- we need a valid speed and at least one stop paramter
+	// Sanity checks -- we need a valid speed and at least one stop paramter (other than time)
 	if (speed == 0) {
 		return false;
-	} else if (distance == 0 && color == UNKNOWN && time == 0 && ir == 0 && sonar == 0) {
+	} else if (distance == 0 && color == UNKNOWN && ir == 0 && sonar == 0) {
 		return false;
 	}
 
-	// Ensure the sign of our speed and distance match (they must to be sane)
-	if (speed * distance < 0) {
-		distance *= -1;
-	}
+	// Assume the caller was reasonable
+	distance = abs(distance);
 
 	// Reset the encoder and timer
 	resetDriveEncoder();
