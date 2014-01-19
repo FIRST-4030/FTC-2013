@@ -1,7 +1,7 @@
 #ifndef FTC_AUTO_INIT
 #define FTC_AUTO_INIT
 #include "../init_robot.c"; // initializeRobot() Routine //
-#define START_LEFT_OFFSET (700)
+#define START_LEFT_OFFSET (900)
 
 typedef enum {
 	RIGHT = 0,

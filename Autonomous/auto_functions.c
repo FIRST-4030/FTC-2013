@@ -98,7 +98,7 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 
 		// We don't turn symetrically, so adjust when we're starting on the left
 		if (side == LEFT) {
-			adjustDistance += 900;
+			adjustDistance += START_LEFT_OFFSET;
 		}
 	} else {
 		adjustDistance = (basketPositions[side][basket] - traveled);
