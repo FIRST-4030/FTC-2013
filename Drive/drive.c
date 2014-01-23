@@ -1,16 +1,17 @@
 #ifndef FTC_DRIVE
 #define FTC_DRIVE
 
-#define TURN_DEGREE_SPEED (75)
-#define BLIPS_PER_DEGREE (2650.0 / 90.0)
-
-// Motor Speeds //
+// Motor Speeds
 #define WHEEL_MAX (100)
 #define LIFT_SPEED (75)
 #define WINCH_SPEED (100)
+#define GYRO_SPEED (100)
 
 // Drive until we hit any of the specified parameters
-bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int time = 5000, bool turn = false, int ir = 0, int sonar = 0) {
+bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int time = 5000, bool turn = false, int ir = 0, int sonar = 0, int gyro = 0) {
+	// Stop
+	StopDriveMotors();
+	
 	// Ensure the time is less than 32k (16-bit timer limit)
 	if (time > 32000) {
 		time = 32000;
@@ -19,15 +20,25 @@ bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 	// Sanity checks -- we need a valid speed and at least one stop paramter (other than time)
 	if (speed == 0) {
 		return false;
-	} else if (distance == 0 && color == UNKNOWN && ir == 0 && sonar == 0) {
+	} else if (distance == 0 && color == UNKNOWN && ir == 0 && sonar == 0 && gyro == 0) {
 		return false;
 	}
 
-	// Assume the caller was reasonable
+	// Assume the caller was reasonable in matching their signs and bools
+	gyro = abs(gyro);
 	distance = abs(distance);
+	if (gyro != 0) {
+		turn = true;
+	}
+	
+	// Setup the gyro, if requested
+	if (gyro != 0) {
+		startGyro();
+	}
 
-	// Reset the encoder and timer
+	// Reset the encoder, gyro, and timer
 	resetDriveEncoder();
+	resetGyro();
 	ClearTimer(T1);
 
 	// Drive straight or turn
@@ -77,12 +88,29 @@ bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 			) {
 				break;
 			}
+		} else if (gyro != 0) {
+			// Stop if the gyro reading is invalid
+			if (!gyroValid()) {
+				failed = true;
+				break;
+			}
+			
+			// Turn until we exceed the requested (absolute) angle
+			int angle = abs(readGyro());
+			if (angle > target) {
+				break;
+			}
 		}
 	}
 
 	// Always stop for just a moment when we're done
 	stopDriveMotors();
-	wait1Msec(50);
+	wait1Msec(10);
+
+	// Stop the gyro, if we started it
+	if (gyro != 0) {
+		StopTask(gyro);
+	}
 
 	// Return false if there was a sensor error
 	return !failed;
@@ -90,32 +118,27 @@ bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 
 // Shorthand for IR-based driving
 bool driveToIR(int speed, int ir, int time = 5000) {
-	return driveToParam(speed, 0, UNKNOWN, time, false, ir, 0);
+	return driveToParam(speed, 0, UNKNOWN, time, false, ir, 0, 0);
 }
 
 // Shorthand for sonar-based driving
 bool driveToSonar(int speed, int sonar, int time = 5000) {
-	return driveToParam(speed, 0, UNKNOWN, time, false, 0, sonar);
+	return driveToParam(speed, 0, UNKNOWN, time, false, 0, sonar, 0);
 }
 
 // Shorthand for distance-based driving
 void driveToDistance(int speed, int distance, int time = 5000) {
-	driveToParam(speed, distance, UNKNOWN, time, false, 0, 0);
+	driveToParam(speed, distance, UNKNOWN, time, false, 0, 0, 0);
 }
 
-// Shorthand for in-place turns
-void turnInPlace(int speed, int distance, bool left = true, int time = 5000) {
+// Shorthand for gyro-based driving
+bool driveToDegree(int degrees, bool left = true, int time = 5000) {
 	// Turn right if requested
 	if (!left) {
 		speed *= -1;
-		distance *= -1;
+		degrees *= -1;
 	}
-	driveToParam(speed, distance, UNKNOWN, time, true, 0, 0);
-}
-
-// Translate via BLIPS_PER_DEGREE for ease-of-use
-void turnInPlaceDegrees(int degrees, bool left = true, int time = 5000) {
-	turnInPlace(TURN_DEGREE_SPEED, (BLIPS_PER_DEGREE * (float)degrees), left, time);
+	return driveToParam(GYRO_SPEED, 0, UNKNOWN, time, true, 0, 0, degrees);
 }
 
 // Drive until we hit the specified color

@@ -113,7 +113,7 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 		FlashLights(3, 250);
 	}
 	// Turn to face baskets
-	turnInPlaceDegrees(90, (bool)side);
+	driveToDegree(90, (bool)side);
 
 	// Wait for the lift to be up
 	while (!IS_LIFT_UP) {
@@ -132,28 +132,25 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	DumpHopper();
 
 	// Nudge back for safety
-	driveToDistance(-FULL_IMPULSE, -400);
+	driveToDistance(-FULL_IMPULSE, -200);
 
 	// Start lowering the lift
 	StartTask(liftDown);
 
 	// Turn back to original orientation
-	turnInPlaceDegrees(90, (!(bool)side));
+	driveToDegree(90, (!(bool)side));
 
 	// Drive backward to the corner
 	driveToDistance(-FULL_IMPULSE, (-1 * (traveled + adjustDistance)), 10000);
 
-	// Nudge back just a bit to be sure we're at the wall
-	driveToDistance(-HALF_IMPULSE, -100);
-
 	// Turn to avoid the ramp
-	turnInPlaceDegrees(105, (bool)side);
+	driveToDegree(105, (bool)side);
 
 	// Drive to white line
 	driveToColor(FULL_IMPULSE, WHITE);
 
 	// Turn to ramp
-	turnInPlaceDegrees(90, (!(bool)side));
+	driveToDegree(90, (!(bool)side));
 
 	// Drive up ramp
 	driveToDistance(FULL_IMPULSE, 7250);
