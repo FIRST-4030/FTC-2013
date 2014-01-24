@@ -6,6 +6,7 @@
 #define LIFT_SPEED (75)
 #define WINCH_SPEED (100)
 #define GYRO_SPEED (100)
+#define SONAR_SPEED (25)
 
 // Drive until we hit any of the specified parameters
 bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int time = 5000, bool turn = false, int ir = 0, int sonar = 0, int gyro = 0) {
@@ -122,17 +123,17 @@ bool driveToIR(int speed, int ir, int time = 5000) {
 }
 
 // Shorthand for sonar-based driving
-bool driveToSonar(int speed, int sonar, int time = 5000) {
-	return driveToParam(speed, 0, UNKNOWN, time, false, 0, sonar, 0);
+bool driveToSonar(int sonar, int time = 5000) {
+	return driveToParam(SONAR_SPEED, 0, UNKNOWN, time, false, 0, sonar, 0);
 }
 
 // Shorthand for distance-based driving
-void driveToDistance(int speed, int distance, int time = 5000) {
+void driveToEncoder(int speed, int distance, int time = 5000) {
 	driveToParam(speed, distance, UNKNOWN, time, false, 0, 0, 0);
 }
 
 // Shorthand for gyro-based driving
-bool driveToDegree(int degrees, bool left = true, int time = 5000) {
+bool driveToGyro(int degrees, bool left = true, int time = 5000) {
 	// Turn right if requested
 	if (!left) {
 		speed *= -1;

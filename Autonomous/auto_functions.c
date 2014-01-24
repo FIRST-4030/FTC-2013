@@ -106,14 +106,14 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	if (adjustDistance < 0) {
 		adjustSpeed *= -1;
 	}
-	driveToDistance(adjustSpeed, adjustDistance);
+	driveToEncoder(adjustSpeed, adjustDistance);
 
 	// Warn if we didn't detect an IR beacon
 	if (!validIR) {
 		FlashLights(3, 250);
 	}
 	// Turn to face baskets
-	driveToDegree(90, (bool)side);
+	driveToGyro(90, (bool)side);
 
 	// Wait for the lift to be up
 	while (!IS_LIFT_UP) {
@@ -121,38 +121,36 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	}
 
 	// Move forward to basket
-	int distance = readSonar();
-	if (!driveToParam(HALF_IMPULSE, 0, UNKNOWN, 1000, false, 0, 46)) {
+	if (!driveToSonar(46, 2000)) {
 		FlashLights(3, 250);
-		driveToDistance(HALF_IMPULSE, 75);
+		driveToEncoder(HALF_IMPULSE, 75);
 	}
-	distance = readSonar();
 
 	// Dump
 	DumpHopper();
 
 	// Nudge back for safety
-	driveToDistance(-FULL_IMPULSE, -200);
+	driveToEncoder(-FULL_IMPULSE, -200);
 
 	// Start lowering the lift
 	StartTask(liftDown);
 
 	// Turn back to original orientation
-	driveToDegree(90, (!(bool)side));
+	driveToGyro(90, (!(bool)side));
 
 	// Drive backward to the corner
-	driveToDistance(-FULL_IMPULSE, (-1 * (traveled + adjustDistance)), 10000);
+	driveToEncoder(-FULL_IMPULSE, (-1 * (traveled + adjustDistance)), 10000);
 
 	// Turn to avoid the ramp
-	driveToDegree(105, (bool)side);
+	driveToGyro(105, (bool)side);
 
 	// Drive to white line
 	driveToColor(FULL_IMPULSE, WHITE);
 
 	// Turn to ramp
-	driveToDegree(90, (!(bool)side));
+	driveToGyro(90, (!(bool)side));
 
 	// Drive up ramp
-	driveToDistance(FULL_IMPULSE, 7250);
+	driveToEncoder(FULL_IMPULSE, 7250);
 }
 #endif
