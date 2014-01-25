@@ -58,7 +58,7 @@ task liftDown() {
 }
 
 // Drive to the IR beacon, dump in the basket, return to start, drive up ramp
-void autoBasketRamp(START_SIDE side = RIGHT) {
+void autoBasketRamp(START_SIDE side = RIGHT, FloorColor color) {
 	// Start raising the lift so it's ready when we arrive
 	StartTask(liftUp);
 
@@ -91,9 +91,9 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 
 		// Back up a bit to get aligned -- alignment varies between baskets 1/2 and 3/4
 		if (basket > 1) {
-			adjustDistance = -700;
+			adjustDistance = FAR_BASKET_OFFSET;
 		} else {
-			adjustDistance = -100;
+			adjustDistance = NEAR_BASKET_OFFSET;
 		}
 
 		// We don't turn symetrically, so adjust when we're starting on the left
@@ -120,17 +120,15 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 		wait1Msec(100);
 	}
 
-	// Move forward to basket
-	if (!driveToSonar(46, 2000)) {
-		FlashLights(3, 250);
-		driveToEncoder(HALF_IMPULSE, 75);
-	}
+	// Drive to the line, then back off
+	driveToColor(QUARTER_IMPULSE, color, 2000);
+	driveToEncoder(-QUARTER_IMPULSE, -475, 1000);
 
 	// Dump
 	DumpHopper();
 
-	// Nudge back for safety
-	driveToEncoder(-FULL_IMPULSE, -200);
+	// Nudge back slightly
+	driveToEncoder(-FULL_IMPULSE, -250);
 
 	// Start lowering the lift
 	StartTask(liftDown);
@@ -139,16 +137,20 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	driveToGyro(90, (!(bool)side));
 
 	// Drive backward to the corner
-	driveToEncoder(-FULL_IMPULSE, (-1 * (traveled + adjustDistance)), 10000);
+	int reverseSlop = 600;
+	if (side == LEFT) {
+		reverseSlop = 750;
+	}
+	driveToEncoder(-FULL_IMPULSE, (-1 * (traveled + adjustDistance - reverseSlop)), 10000);
 
 	// Turn to avoid the ramp
-	driveToGyro(105, (bool)side);
+	driveToGyro(110, (bool)side);
 
 	// Drive to white line
 	driveToColor(FULL_IMPULSE, WHITE);
 
 	// Turn to ramp
-	driveToGyro(90, (!(bool)side));
+	driveToGyro(100, (!(bool)side));
 
 	// Drive up ramp
 	driveToEncoder(FULL_IMPULSE, 7250);
