@@ -12,6 +12,7 @@ const tMUXSensor lightLeft = msensor_S2_4;
 #include "JoystickDriver.c"
 #include "Sensors/light.c"
 #include "Sensors/ir.c"
+#include "Sensors/gyro.c"
 #include "Sensors/sonar.c"
 #include "Motors/servos.c"
 #include "Motors/motors.c"

@@ -3,6 +3,7 @@
 #pragma config(Sensor, S1,     motors,         sensorI2CMuxController)
 #pragma config(Sensor, S2,     SMUX,           sensorI2CCustom9V)
 #pragma config(Sensor, S3,     servos,         sensorI2CMuxController)
+#pragma config(Sensor, S4,     gyroSensor,     sensorI2CHiTechnicGyro)
 #pragma config(Motor,  motorA,          flagMotorA,    tmotorNXT, openLoop, encoder)
 #pragma config(Motor,  motorB,          flagMotorB,    tmotorNXT, openLoop, reversed, encoder)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop, encoder)

@@ -42,5 +42,5 @@ task main() {
 	waitForStart();
 
 	// Run the complete autonomous Basket+Ramp routine
-	autoBasketRamp(LEFT);
+	autoBasketRamp(LEFT, BLUE);
 }
