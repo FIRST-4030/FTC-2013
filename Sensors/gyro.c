@@ -11,6 +11,11 @@
 bool GYRO_READY = false;
 float GYRO_ANGLE = 0.0;
 
+// Return the raw speed reading from the gyro
+float readGyroSpeed() {
+	return HTGYROreadRot(gyroSensor);
+}
+
 task gyro() {
 	GYRO_READY = false;
 	GYRO_ANGLE = 0.0;
@@ -44,11 +49,6 @@ task gyro() {
 		GYRO_ANGLE += speed * ((float)GYRO_PERIOD / 1000.0);
 		GYRO_READY = true;
 	}
-}
-
-// Return the raw speed reading from the gyro
-float readGyroSpeed() {
-	return HTGYROreadRot(gyroSensor);
 }
 
 // Reset the accumulated angle
