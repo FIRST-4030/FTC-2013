@@ -40,7 +40,8 @@ task main() {
 
 	// Wait for the beginning of autonomous phase.
 	waitForStart();
+	//wait1Msec(2500);
 
 	// Run the complete autonomous Basket+Ramp routine
-	autoBasketRamp(LEFT, RED);
+	autoBasketRamp(RIGHT);
 }

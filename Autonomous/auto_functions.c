@@ -58,7 +58,7 @@ task liftDown() {
 }
 
 // Drive to the IR beacon, dump in the basket, return to start, drive up ramp
-void autoBasketRamp(START_SIDE side = RIGHT, FloorColor color) {
+void autoBasketRamp(START_SIDE side = RIGHT) {
 	// Start raising the lift so it's ready when we arrive
 	StartTask(liftUp);
 
