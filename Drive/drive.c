@@ -55,7 +55,7 @@ bool driveToParam(int speed, int distance = 0, ColorBitmap colors = 0, int time 
 
 	// Loop until we hit a stop condition
 	while (true) {
-		if (colors != 0 && (onColors(colors, LSvalRaw(lineLeft)) || onColors(colors, LSvalRaw(lineRight)))) {
+		if (colors != 0 && (onColors(colors, readLight(true)) || onColors(colors, readLight(false)))) {
 			break;
 		} else if (distance != 0 && (abs(readDriveEncoder()) > distance)) {
 			break;

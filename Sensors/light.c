@@ -3,6 +3,18 @@
 
 #include "../drivers/lego-light.h"
 
+// Switch this when using the light sensors on the smux vs directly
+#define LIGHT_SENSOR_PORT_TYPE tMUXSensor
+//#define LIGHT_SENSOR_PORT_TYPE tSensors
+
+// Store the light sensor ports for use in light functions
+LIGHT_SENSOR_PORT_TYPE lineLeft;
+LIGHT_SENSOR_PORT_TYPE lineRight;
+void setLineSensors(LIGHT_SENSOR_PORT_TYPE left, LIGHT_SENSOR_PORT_TYPE right) {
+	lineLeft  = left;
+	lineRight = right;
+}
+
 // Which colors can we detect
 typedef enum {
 	BLACK,
@@ -113,6 +125,14 @@ void FlashLights(int times, int delay) {
 	  LSsetActive(lightRight);
   	LSsetActive(lightLeft);
 		wait1Msec(delay);
+	}
+}
+
+int readLight(bool left = true) {
+	if (left) {
+		return LSvalRaw(lineLeft);
+	} else {
+		return LSvalRaw(lineRight);
 	}
 }
 

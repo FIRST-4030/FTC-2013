@@ -1,16 +1,7 @@
 #ifndef FTC_LINES
 #define FTC_LINES
 
-#define LIGHT_SENSOR_PORT_TYPE tMUXSensor
-//#define LIGHT_SENSOR_PORT_TYPE tSensors
-
-// Store the light sensor ports for use in line functions
-LIGHT_SENSOR_PORT_TYPE lineLeft;
-LIGHT_SENSOR_PORT_TYPE lineRight;
-void setLineSensors(LIGHT_SENSOR_PORT_TYPE left, LIGHT_SENSOR_PORT_TYPE right) {
-	lineLeft  = left;
-	lineRight = right;
-}
+#include "../Sensors/light.c"
 
 // Follow a line, after we've been aligned to it, stopping based on color, distance, or time
 void _followLine(FloorColor color, int speed, FloorColor stopColor, int stopDistance, int stopTime) {
