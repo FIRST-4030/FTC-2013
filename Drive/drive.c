@@ -25,17 +25,15 @@ bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 		return false;
 	}
 
-	// Assume the caller was reasonable in matching their signs and bools
-	gyro = abs(gyro);
+	// Assume the caller was reasonable in matching their signs
 	distance = abs(distance);
+
+	// Setup the gyro, if requested, and force the bools and signs to reasonable values
 	if (gyro != 0) {
 		turn = true;
-	}
-
-	// Setup the gyro, if requested
-	if (gyro != 0) {
-		startGyro();
+		gyro = abs(gyro);
 		gyro -= GYRO_OVERRUN;
+		startGyro();
 	}
 
 	// Reset the encoder, gyro, and timer
