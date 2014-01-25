@@ -13,6 +13,8 @@ typedef enum {
 	UNKNOWN
 } FloorColor;
 const FloorColor NUM_COLORS = 5;
+typedef int ColorBitmap;
+#define COLOR_TO_BITMAP(x) (1 << x)
 
 // Each color has a min and max value
 typedef struct {
@@ -74,44 +76,33 @@ void setLightSensorHeight(float height) {
 	}
 }
 
-// Determine if the floor matches the indicated color
-bool onColor(FloorColor color, int sensorVal) {
-	bool onColor = false;
-	if (sensorVal >= COLORS[color].min && sensorVal <= COLORS[color].max) {
-		onColor = true;
-	}
-	return onColor;
-}
-
-// Determine the color under the sensor
-FloorColor floorColor(int sensorVal) {
-	int color;
+// Return a bitmap of all colors matching the provided sensorVal
+ColorBitmap matchColors(int sensorVal) {
+	ColorBitmap bitmap = 0;
+	int color = 0;
 	for (color = 0; color < NUM_COLORS; color++) {
-		if (onColor(color, sensorVal)) {
-			return (FloorColor)color;
+		if (COLOR_TO_BITMAP(color) & bitmap) {
+			if (sensorVal >= COLORS[color].min && sensorVal <= COLORS[color].max) {
+				bitmap |= COLOR_TO_BITMAP(color);
+			}
 		}
 	}
-	return UNKNOWN;
+
+	return bitmap;
 }
 
-bool onBlack(int sensorVal) {
-	return onColor(BLACK, sensorVal);
+// Return true if the provided sensorVal matches any of the colors marked in the provided bitmap
+bool onColors(ColorBitmap bitmap, int sensorVal) {
+	ColorBitmap colors = matchColors(sensorVal);
+	if (colors & bitmap != 0) {
+		return true;
+	}
+	return false;
 }
 
-bool onWhite(int sensorVal) {
-	return onColor(WHITE, sensorVal);
-}
-
-bool onGrey(int sensorVal) {
-	return onColor(GREY, sensorVal);
-}
-
-bool onBlue(int sensorVal) {
-	return onColor(BLUE, sensorVal);
-}
-
-bool onRed(int sensorVal) {
-	return onColor(RED, sensorVal);
+// Return true if the provided sensorVal matches the provided color
+bool onColor(FloorColor color, int sensorVal) {
+	return onColors(COLOR_TO_BITMAP(color), sensorVal);
 }
 
 void FlashLights(int times, int delay) {

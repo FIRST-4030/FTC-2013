@@ -121,7 +121,7 @@ void autoBasketRamp(START_SIDE side = RIGHT, FloorColor color) {
 	}
 
 	// Drive to the line, then back off
-	driveToColor(QUARTER_IMPULSE, color, 2000);
+	driveToColors(QUARTER_IMPULSE, COLOR_TO_BITMAP(BLUE) | COLOR_TO_BITMAP(RED), 2000);
 	driveToEncoder(-QUARTER_IMPULSE, -475, 1000);
 
 	// Dump
@@ -137,6 +137,7 @@ void autoBasketRamp(START_SIDE side = RIGHT, FloorColor color) {
 	driveToGyro(90, (!(bool)side));
 
 	// Drive backward to the corner
+	// After our turns we lose a bit of distance, so provide a "slop" adjustment
 	int reverseSlop = 600;
 	if (side == LEFT) {
 		reverseSlop = 750;

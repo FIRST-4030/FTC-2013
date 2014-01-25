@@ -9,7 +9,7 @@
 #define SONAR_SPEED (25)
 
 // Drive until we hit any of the specified parameters
-bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int time = 5000, bool turn = false, int ir = 0, int sonar = 0, int gyro = 0) {
+bool driveToParam(int speed, int distance = 0, ColorBitmap colors = 0, int time = 5000, bool turn = false, int ir = 0, int sonar = 0, int gyro = 0) {
 	// Stop
 	stopDriveMotors();
 
@@ -21,7 +21,7 @@ bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 	// Sanity checks -- we need a valid speed and at least one stop paramter (other than time)
 	if (speed == 0) {
 		return false;
-	} else if (distance == 0 && color == UNKNOWN && ir == 0 && sonar == 0 && gyro == 0) {
+	} else if (distance == 0 && colors == 0 && ir == 0 && sonar == 0 && gyro == 0) {
 		return false;
 	}
 
@@ -55,7 +55,7 @@ bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 
 	// Loop until we hit a stop condition
 	while (true) {
-		if (color != UNKNOWN && (onColor(color, LSvalRaw(lineLeft)) || onColor(color, LSvalRaw(lineRight)))) {
+		if (colors != 0 && (onColors(colors, LSvalRaw(lineLeft)) || onColors(colors, LSvalRaw(lineRight)))) {
 			break;
 		} else if (distance != 0 && (abs(readDriveEncoder()) > distance)) {
 			break;
@@ -119,33 +119,41 @@ bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 
 // Shorthand for IR-based driving
 bool driveToIR(int speed, int ir, int time = 5000) {
-	return driveToParam(speed, 0, UNKNOWN, time, false, ir, 0, 0);
+	return driveToParam(speed, 0, 0, time, false, ir, 0, 0);
 }
 
 // Shorthand for sonar-based driving
 bool driveToSonar(int sonar, int time = 5000) {
-	return driveToParam(SONAR_SPEED, 0, UNKNOWN, time, false, 0, sonar, 0);
+	int speed = SONAR_SPEED;
+	if (sonar < 0) {
+		speed *= -1;
+	}
+	return driveToParam(speed, 0, 0, time, false, 0, sonar, 0);
 }
 
 // Shorthand for distance-based driving
 void driveToEncoder(int speed, int distance, int time = 5000) {
-	driveToParam(speed, distance, UNKNOWN, time, false, 0, 0, 0);
+	driveToParam(speed, distance, 0, time, false, 0, 0, 0);
 }
 
 // Shorthand for gyro-based driving
 bool driveToGyro(int degrees, bool left = true, int time = 5000) {
-	// Turn right if requested
 	int speed = GYRO_SPEED;
 	if (!left) {
 		speed *= -1;
 		degrees *= -1;
 	}
-	return driveToParam(speed, 0, UNKNOWN, time, true, 0, 0, degrees);
+	return driveToParam(speed, 0, 0, time, true, 0, 0, degrees);
 }
 
-// Drive until we hit the specified color
+// Shorthand for multi-color-based driving
+void driveToColors(int speed, ColorBitmap colors, int time = 5000) {
+	driveToParam(speed, 0, colors, time, false, 0, 0, 0);
+}
+
+// Shorthand for color-based driving
 void driveToColor(int speed, FloorColor color, int time = 5000) {
-	driveToParam(speed, 0, color, time, false, 0, 0, 0);
+	driveToColors(speed, COLOR_TO_BITMAP(color), time);
 }
 
 // Direct Drive Functions //
