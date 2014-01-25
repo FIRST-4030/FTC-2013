@@ -11,8 +11,8 @@
 // Drive until we hit any of the specified parameters
 bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int time = 5000, bool turn = false, int ir = 0, int sonar = 0, int gyro = 0) {
 	// Stop
-	StopDriveMotors();
-	
+	stopDriveMotors();
+
 	// Ensure the time is less than 32k (16-bit timer limit)
 	if (time > 32000) {
 		time = 32000;
@@ -31,10 +31,11 @@ bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 	if (gyro != 0) {
 		turn = true;
 	}
-	
+
 	// Setup the gyro, if requested
 	if (gyro != 0) {
 		startGyro();
+		gyro -= GYRO_OVERRUN;
 	}
 
 	// Reset the encoder, gyro, and timer
@@ -95,10 +96,10 @@ bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 				failed = true;
 				break;
 			}
-			
+
 			// Turn until we exceed the requested (absolute) angle
 			int angle = abs(readGyro());
-			if (angle > target) {
+			if (angle > gyro) {
 				break;
 			}
 		}
@@ -106,7 +107,6 @@ bool driveToParam(int speed, int distance = 0, FloorColor color = UNKNOWN, int t
 
 	// Always stop for just a moment when we're done
 	stopDriveMotors();
-	wait1Msec(10);
 
 	// Stop the gyro, if we started it
 	if (gyro != 0) {
@@ -135,16 +135,17 @@ void driveToEncoder(int speed, int distance, int time = 5000) {
 // Shorthand for gyro-based driving
 bool driveToGyro(int degrees, bool left = true, int time = 5000) {
 	// Turn right if requested
+	int speed = GYRO_SPEED;
 	if (!left) {
 		speed *= -1;
 		degrees *= -1;
 	}
-	return driveToParam(GYRO_SPEED, 0, UNKNOWN, time, true, 0, 0, degrees);
+	return driveToParam(speed, 0, UNKNOWN, time, true, 0, 0, degrees);
 }
 
 // Drive until we hit the specified color
 void driveToColor(int speed, FloorColor color, int time = 5000) {
-	driveToParam(speed, 0, color, time, false);
+	driveToParam(speed, 0, color, time, false, 0, 0, 0);
 }
 
 // Direct Drive Functions //
