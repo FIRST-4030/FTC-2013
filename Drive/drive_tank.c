@@ -19,30 +19,25 @@ task Drive()
 		//Get the Latest joystick values
 		getJoystickSettings(joystick);
 
+		// Reverse joysticks if 5 and 6 are held
+		int joy_left = joystick.joy1_y1;
+		int joy_right = joystick.joy1_y2;
+		if(joy1Btn(5) == 1 && joy1Btn(6) == 1) {
+			int temp = joy_left;
+			joy_left = -1 * joy_right;
+			joy_right = -1 * temp;
+		}
+
 		//Each of these passes a value to set the motors to under certain circumstances
 		//Left Wheels
-		if(abs(joystick.joy1_y1) > threshold){
-			if(joy1Btn(5) == 1 && joy1Btn(6) == 1) {
-				DriveRightSide(-joystick.joy1_y1);
-			} else{
-				int power = joystick.joy1_y1;
-				if(joy1Btn(7) == 1)
-					power = (float)power * 0.25;
-				DriveLeftSide(power);
-			}
+		if(abs(joy_left) > threshold){
+			DriveLeftSide(joy_left);
 		} else {
 			DriveLeftSide(0);
 		}
 		//Right Wheels
-		if(abs(joystick.joy1_y2) > threshold) {
-			if(joy1Btn(5) == 1 && joy1Btn(6) == 1) {
-				DriveLeftSide(-joystick.joy1_y2);
-			} else {
-				int power = joystick.joy1_y1;
-				if(joy1Btn(7) == 1)
-					power = (float)power * 0.25;
-				DriveRightSide(joystick.joy1_y2);
-			}
+		if(abs(joy_right) > threshold) {
+			DriveRightSide(joy_right);
 		}	else {
 			DriveRightSide(0);
 		}
