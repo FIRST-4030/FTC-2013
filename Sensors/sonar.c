@@ -10,7 +10,7 @@ int readSonar() {
 bool sonarValid(int val) {
 	if (val < 10) {
 		return false;
-	} else if (val > 1000) {
+	} else if (val > 300) {
 		return false;
 	}
 	return true;
