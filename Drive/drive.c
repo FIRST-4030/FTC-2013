@@ -44,25 +44,17 @@ bool driveToParam(int speed, int distance = 0, ColorBitmap colors = 0, int time 
 	ClearTimer(T1);
 
 	// Drive straight or turn
-if (colors == 0) {
 	if (turn) {
 		runDriveMotors(-speed, speed);
 	} else {
 		runDriveMotors(speed, speed);
 	}
-}
 
 	// Track sensor failures
 	bool failed = false;
 
 	// Loop until we hit a stop condition
 	while (true) {
-if (colors != 0) {
-		time = 0;
-		runDriveMotors(speed, speed);
-		wait1Msec(50);
-		stopDriveMotors();
-}
 		if (colors != 0 && (onColors(colors, readLight(true)) || onColors(colors, readLight(false)))) {
 			break;
 		} else if (distance != 0 && (abs(readDriveEncoder()) > distance)) {
