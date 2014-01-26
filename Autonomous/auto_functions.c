@@ -137,9 +137,11 @@ void autoBasketRamp(START_SIDE side = RIGHT, FloorColor color) {
 	driveToGyro(90, (!(bool)side));
 
 	// Drive backward to the corner
-	int reverseSlop = 600;
+	// Include a "slop" factor to adjust for our sloppy encoder
+	// This keeps us from backing into the wall when returning
+	int reverseSlop = 550;
 	if (side == LEFT) {
-		reverseSlop = 750;
+		reverseSlop += 100;
 	}
 	driveToEncoder(-FULL_IMPULSE, (-1 * (traveled + adjustDistance - reverseSlop)), 10000);
 
