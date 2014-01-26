@@ -35,6 +35,9 @@
 
 #define SPINNER_EJECT_SPEED (50)
 
+int rawColor = 0;
+int colorMap = 0;
+
 task main()
 {
   initializeRobot();
@@ -42,9 +45,15 @@ task main()
 
   StartTask(Drive);
 
+	setLightSensorHeight(5.0);
+	setDriveMotors(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor);
+	setLineSensors(lightLeft, lightRight);
   int threshold = 10;
 	while(true)
 	{
+		rawColor = readLight(true);
+		colorMap = matchColors(rawColor);
+
 		getJoystickSettings(joystick);
 		//Spinner // Left Joystick //
 		if(abs(joystick.joy2_y1) > threshold) {

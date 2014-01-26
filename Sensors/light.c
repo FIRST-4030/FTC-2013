@@ -75,16 +75,16 @@ void setLightSensorHeight(float height) {
 		COLORS[WHITE].min = 430;
 		COLORS[WHITE].max = 480;
 	} else {
-		COLORS[BLACK].min = 275;
-		COLORS[BLACK].max = 320;
+		COLORS[BLACK].min = 100;
+		COLORS[BLACK].max = 299;
 		COLORS[BLUE].min  = 300;
-		COLORS[BLUE].max  = 330;
-		COLORS[GREY].min  = 360;
-		COLORS[GREY].max  = 390;
-		COLORS[RED].min   = 420;
-		COLORS[RED].max   = 450;
-		COLORS[WHITE].min = 475;
-		COLORS[WHITE].max = 505;
+		COLORS[BLUE].max  = 344;
+		COLORS[GREY].min  = 345;
+		COLORS[GREY].max  = 404;
+		COLORS[RED].min   = 405;
+		COLORS[RED].max   = 467;
+		COLORS[WHITE].min = 468;
+		COLORS[WHITE].max = 525;
 	}
 }
 
@@ -93,10 +93,8 @@ ColorBitmap matchColors(int sensorVal) {
 	ColorBitmap bitmap = 0;
 	int color = 0;
 	for (color = 0; color < NUM_COLORS; color++) {
-		if (COLOR_TO_BITMAP(color) & bitmap) {
-			if (sensorVal >= COLORS[color].min && sensorVal <= COLORS[color].max) {
-				bitmap |= COLOR_TO_BITMAP(color);
-			}
+		if (sensorVal >= COLORS[color].min && sensorVal <= COLORS[color].max) {
+			bitmap |= COLOR_TO_BITMAP(color);
 		}
 	}
 

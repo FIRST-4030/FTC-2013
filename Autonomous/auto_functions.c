@@ -121,7 +121,7 @@ void autoBasketRamp(START_SIDE side = RIGHT) {
 	}
 
 	// Drive to the line, then back off
-	driveToColors(QUARTER_IMPULSE, COLOR_TO_BITMAP(BLUE) | COLOR_TO_BITMAP(RED), 2000);
+	driveToColors(QUARTER_IMPULSE, ~COLOR_TO_BITMAP(GREY), 2000);
 	driveToEncoder(-QUARTER_IMPULSE, -475, 1000);
 
 	// Dump
