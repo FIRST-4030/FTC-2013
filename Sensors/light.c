@@ -64,13 +64,13 @@ void setLightSensorHeight(float height) {
 		COLORS[BLACK].min = 275;
 		COLORS[BLACK].max = 320;
 		COLORS[BLUE].min  = 300;
-		COLORS[BLUE].max  = 330;
+		COLORS[BLUE].max  = 355;
 		COLORS[GREY].min  = 360;
 		COLORS[GREY].max  = 390;
 		COLORS[RED].min   = 420;
-		COLORS[RED].max   = 450;
+		COLORS[RED].max   = 525;
 		COLORS[WHITE].min = 475;
-		COLORS[WHITE].max = 505;
+		COLORS[WHITE].max = 600;
 	}
 }
 
