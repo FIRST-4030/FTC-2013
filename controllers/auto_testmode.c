@@ -27,14 +27,19 @@ task AutoTestControl()
 		//Winches
 		if(joy1Btn(6) == 1) { // R1 //
 			DriveWinchMotors(WINCH_SPEED);
-		}
-		else if(joy1Btn(8) == 1) { // R2 //
-			DriveWinchMotors(WINCH_SPEED);
 		} else if(joy1Btn(10) == 1) { // START //
 			DriveWinchMotors(-0.5*WINCH_SPEED);
 		}	else {
 			DriveWinchMotors(0);
 		}
+
+		//Flag
+		if(joy1Btn(8) == 1) // R2 //
+			DriveFlagMotor(100);
+		else
+			StopFlagMotor();
+
+
 
 		//Hooks
 		if(joy1Btn(5) == 1) {         // L1 //
