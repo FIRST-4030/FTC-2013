@@ -4,6 +4,33 @@
 // Autonomous Mode Operational Functions //
 // Put functions here which do specific actions on the robot. //
 
+//Made by Ariel for Whitman Science Fair
+//Follows the IR beacon attatched to a board and drives towards it, chasing it
+void followIR() {
+	int sonarGoal = 10000;
+	int speed = 50;
+	while(true) {
+		int irVal = readIR(); //Get IR value
+		if(!irValid(irVal))
+			stopDriveMotors(); //Stop robot if IR is invalid
+		else {
+			if(irVal == 5) { //if centered on beacon
+				stopDriveMotors(); //safety stop
+				int sonarVal = readSonar();
+				if(sonarValid(sonarVal))
+					while(irVal == 5 && sonarVal < sonarGoal){ //while it isn't close to the board and still centered on it
+						runDriveMotors(-25, -25); //drive towards board
+						irVal = readIR(); //get values from sensors again
+						sonarVal = readSonar();
+					}
+			} else if(irVal < 5)
+				runDriveMotors(50, -50); //Turns robot right if beacon is to the right
+			else
+				runDriveMotors(-50, 50); //Turns robot left if beacon is to the left
+		}
+	}
+}
+
 void MoveLift(bool down = true, int duration = 0) {
 	int speed = LIFT_SPEED;
 
