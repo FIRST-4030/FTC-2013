@@ -32,6 +32,7 @@
 #pragma debuggerWindows("joystickGame");
 #include "teleop_includes.h"
 #include "drive/drive_tank.c"
+#include "Drive/drive_mec.c"
 
 #define SPINNER_EJECT_SPEED (50)
 
