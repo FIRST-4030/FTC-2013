@@ -1,7 +1,7 @@
-// NOTE - Only one FTC_DRIVETASK can be defined at a time. //
-// If you include more than one FTC_DRIVETASK file, the first one included will be used //
-#ifndef FTC_DRIVETASK
-#define FTC_DRIVETASK
+// NOTE - Only one FTC_DRIVETASKM can be defined at a time. //
+// If you include more than one FTC_DRIVETASKM file, the first one included will be used //
+#ifndef FTC_DRIVETASKM
+#define FTC_DRIVETASKM
 
 ///// MECANUM DRIVE TASK /////
 // Standard Mecanum Drive
@@ -23,7 +23,7 @@ task DriveMec()
 		//Left joystick is used for driving, right for spinning
 		//Y1, Forward and backward
 		if(abs(joystick.joy1_y1) > threshold)
-			Y1 = joystick.joy1_y1];
+			Y1 = joystick.joy1_y1;
 		else
 			Y1 = 0;
 
@@ -39,7 +39,7 @@ task DriveMec()
 		else
 			X2 = 0;
 
-		DriveMecWheels(Y1, X1, X2);
+		DriveMecWheels(-Y1, -X1, X2);
 	}
 }
 
