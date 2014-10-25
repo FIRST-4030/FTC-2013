@@ -197,6 +197,8 @@ void DriveLiftMotor(int power)
 }
 
 void DriveMecWheels(int Y1, int X1, int X2) {
+	Y1 = -Y1;
+	X1 = -X1;
 	motor[leftRearMotor] = Y1 - X2 - X1;
 	motor[leftFrontMotor] =  Y1 - X2 + X1;
 	motor[rightRearMotor] = Y1 + X2 + X1;

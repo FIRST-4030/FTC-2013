@@ -39,7 +39,7 @@ task DriveMec()
 		else
 			X2 = 0;
 
-		DriveMecWheels(-Y1, -X1, X2);
+		DriveMecWheels(Y1, X1, X2);
 	}
 }
 
