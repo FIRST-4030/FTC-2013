@@ -14,13 +14,17 @@ void initializeRobot() {
 	motor[leftWinch] = 0;
 	motor[rightWinch] = 0;
 
+	/* Commented out to test servo on new robot for 2014 year
 	// Medium hook rate and retracted position
 	SetHookServos(HOOK_MIN);
+	*/
 	servoChangeRate[leftHook] = 2;
 	servoChangeRate[rightHook] = 2;
 
+	/* Commented out for same reason as above
 	// Low hopper speed and retracted position
 	SetHopperServos(HOPPER_MAX);
+	*/
 	servoChangeRate[leftHopper] = 1;
 	servoChangeRate[rightHopper] = 1;
 
